@@ -1,129 +1,107 @@
-# Feature Specification: [FEATURE NAME]
+# Spec — Controle de Produção Diária
 
-**Feature Branch**: `[###-feature-name]`  
-**Created**: [DATE]  
-**Status**: Draft  
-**Input**: User description: "$ARGUMENTS"
+## Visão geral
 
-## User Scenarios & Testing *(mandatory)*
-
-<!--
-  IMPORTANT: User stories should be PRIORITIZED as user journeys ordered by importance.
-  Each user story/journey must be INDEPENDENTLY TESTABLE - meaning if you implement just ONE of them,
-  you should still have a viable MVP (Minimum Viable Product) that delivers value.
-  
-  Assign priorities (P1, P2, P3, etc.) to each story, where P1 is the most critical.
-  Think of each story as a standalone slice of functionality that can be:
-  - Developed independently
-  - Tested independently
-  - Deployed independently
-  - Demonstrated to users independently
--->
-
-### User Story 1 - [Brief Title] (Priority: P1)
-
-[Describe this user journey in plain language]
-
-**Why this priority**: [Explain the value and why it has this priority level]
-
-**Independent Test**: [Describe how this can be tested independently - e.g., "Can be fully tested by [specific action] and delivers [specific value]"]
-
-**Acceptance Scenarios**:
-
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
-2. **Given** [initial state], **When** [action], **Then** [expected outcome]
+Sistema web para registrar e acompanhar a produção diária de funcionárias em uma pequena empresa familiar de incenso e produtos de limpeza energética. Substitui uma planilha manual mantida pelo gestor, com foco em entrada rápida de dados, visualização clara e exportação para Excel.
 
 ---
 
-### User Story 2 - [Brief Title] (Priority: P2)
+## Usuários
 
-[Describe this user journey in plain language]
-
-**Why this priority**: [Explain the value and why it has this priority level]
-
-**Independent Test**: [Describe how this can be tested independently]
-
-**Acceptance Scenarios**:
-
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+- **Gestor (pai):** único usuário. Entra os dados diariamente, consulta totais e exporta relatórios.
+- **Funcionárias:** 6 a 15 pessoas. Aparecem no sistema pelo nome, não acessam o sistema diretamente.
 
 ---
 
-### User Story 3 - [Brief Title] (Priority: P3)
+## Funcionalidades
 
-[Describe this user journey in plain language]
+### 1. Cadastro de funcionárias
+- Adicionar, editar e desativar funcionárias (nome).
+- Funcionária desativada não aparece na grade diária, mas mantém histórico.
 
-**Why this priority**: [Explain the value and why it has this priority level]
+### 2. Grade de produção diária
+- Tela principal: tabela com **uma linha por funcionária** e **uma coluna por dia do mês**.
+- Célula editável em linha: gestor clica na célula do dia e digita a quantidade produzida.
+- Células do fim de semana são marcadas visualmente (desabilitadas por padrão, mas editáveis se necessário).
+- Linha de **total do dia** (soma de todas as funcionárias naquele dia) na linha de rodapé.
+- Coluna de **total mensal** por funcionária na última coluna.
+- Coluna de **total semanal** por funcionária (agrupado por semana ISO).
 
-**Independent Test**: [Describe how this can be tested independently]
+### 3. Registro de faltas
+- Em vez de um número, a célula de um dia pode ser marcada como falta.
+- Ao marcar como falta, abrir um seletor com o motivo:
+  - **Atestado** (médico)
+  - **Falta** (comum, injustificada)
+  - **Outro** (campo de texto livre)
+- Falta é exibida na célula com ícone ou cor diferente (não entra na soma de produção).
+- Relatório de faltas do mês visível por funcionária.
 
-**Acceptance Scenarios**:
+### 4. Navegação por mês
+- Seletor mês/ano no topo da tela.
+- Histórico completo disponível para consulta — qualquer mês passado pode ser aberto e editado.
+- Mês atual aberto por padrão ao entrar no sistema.
 
-1. **Given** [initial state], **When** [action], **Then** [expected outcome]
+### 5. Resumo mensal
+- Painel com os totais do mês corrente (ou do mês selecionado):
+  - Total produzido por funcionária
+  - Total geral da empresa no mês
+  - Quantidade de faltas por funcionária (com breakdown por motivo)
+
+### 6. Exportação para Excel
+- Botão "Exportar Excel" gera uma planilha `.xlsx` com:
+  - Aba **Produção:** grade idêntica à tela (funcionária × dia, totais por semana, total mensal).
+  - Aba **Faltas:** lista de faltas do mês com funcionária, data e motivo.
+- Nome do arquivo sugerido: `producao_YYYY_MM.xlsx`.
 
 ---
 
-[Add more user stories as needed, each with an assigned priority]
+## Regras de negócio
 
-### Edge Cases
+- Dias sem registro (nem produção nem falta) são tratados como vazios — não entram nos totais.
+- Total semanal considera apenas dias úteis registrados (segunda a sexta por padrão).
+- Uma célula não pode ter produção e falta ao mesmo tempo.
+- Não há autenticação: sistema roda em rede local, acessado diretamente pelo navegador.
 
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right edge cases.
--->
+---
 
-- What happens when [boundary condition]?
-- How does system handle [error scenario]?
+## Stack técnica
 
-## Requirements *(mandatory)*
+| Camada | Tecnologia |
+|---|---|
+| Frontend | Angular + SCSS |
+| Backend | .NET Web API (C#) |
+| Banco de dados | PostgreSQL |
+| ORM | Entity Framework Core |
+| Export Excel | biblioteca EPPlus (backend) |
 
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right functional requirements.
--->
+---
 
-### Functional Requirements
+## Fora do escopo
 
-- **FR-001**: System MUST [specific capability, e.g., "allow users to create accounts"]
-- **FR-002**: System MUST [specific capability, e.g., "validate email addresses"]  
-- **FR-003**: Users MUST be able to [key interaction, e.g., "reset their password"]
-- **FR-004**: System MUST [data requirement, e.g., "persist user preferences"]
-- **FR-005**: System MUST [behavior, e.g., "log all security events"]
-- **FR-LOG**: System MUST registrar erros com contexto (timestamp, operação, detalhes) — obrigatório por Constituição Princípio III
+- Login / controle de acesso
+- Múltiplos usuários simultâneos
+- Metas de produção ou indicadores de desempenho
+- Integração com folha de pagamento
+- App mobile
 
-*Example of marking unclear requirements:*
+---
 
-- **FR-006**: System MUST authenticate users via [NEEDS CLARIFICATION: auth method not specified - email/password, SSO, OAuth?]
-- **FR-007**: System MUST retain user data for [NEEDS CLARIFICATION: retention period not specified]
+## Modelo de dados (rascunho)
 
-### Key Entities *(include if feature involves data)*
+```
+Funcionaria
+  id, nome, ativa
 
-- **[Entity 1]**: [What it represents, key attributes without implementation]
-- **[Entity 2]**: [What it represents, relationships to other entities]
+RegistroDiario
+  id, funcionaria_id, data (DATE), quantidade (nullable), falta (bool), motivo_falta (enum: atestado | falta | outro | null), observacao_falta (nullable text)
+```
 
-## Success Criteria *(mandatory)*
+---
 
-<!--
-  ACTION REQUIRED: Define measurable success criteria.
-  These must be technology-agnostic and measurable.
--->
+## Critérios de aceite (principais)
 
-### Measurable Outcomes
-
-- **SC-001**: [Measurable metric, e.g., "Users can complete account creation in under 2 minutes"]
-- **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
-- **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
-- **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
-
-## Assumptions
-
-<!--
-  ACTION REQUIRED: The content in this section represents placeholders.
-  Fill them out with the right assumptions based on reasonable defaults
-  chosen when the feature description did not specify certain details.
--->
-
-- [Assumption about target users, e.g., "Users have stable internet connectivity"]
-- [Assumption about scope boundaries, e.g., "Mobile support is out of scope for v1"]
-- [Assumption about data/environment, e.g., "Existing authentication system will be reused"]
-- [Dependency on existing system/service, e.g., "Requires access to the existing user profile API"]
+- [ ] Gestor consegue abrir o mês atual e digitar a produção de cada funcionária em cada dia sem sair da tela.
+- [ ] Ao marcar falta, o sistema pede o motivo antes de salvar.
+- [ ] Totais por dia, por semana e por mês são calculados automaticamente e visíveis na mesma tela.
+- [ ] Exportação gera um `.xlsx` legível diretamente no Excel/LibreOffice.
+- [ ] É possível consultar qualquer mês anterior sem perda de dados.
