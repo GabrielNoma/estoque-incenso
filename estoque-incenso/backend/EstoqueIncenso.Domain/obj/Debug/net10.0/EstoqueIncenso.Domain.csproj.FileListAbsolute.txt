@@ -1,0 +1,11 @@
+C:\Users\Pichau\Projetins\Estoque\estoque-incenso\backend\EstoqueIncenso.Domain\bin\Debug\net10.0\EstoqueIncenso.Domain.deps.json
+C:\Users\Pichau\Projetins\Estoque\estoque-incenso\backend\EstoqueIncenso.Domain\bin\Debug\net10.0\EstoqueIncenso.Domain.dll
+C:\Users\Pichau\Projetins\Estoque\estoque-incenso\backend\EstoqueIncenso.Domain\bin\Debug\net10.0\EstoqueIncenso.Domain.pdb
+C:\Users\Pichau\Projetins\Estoque\estoque-incenso\backend\EstoqueIncenso.Domain\obj\Debug\net10.0\EstoqueIncenso.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Pichau\Projetins\Estoque\estoque-incenso\backend\EstoqueIncenso.Domain\obj\Debug\net10.0\EstoqueIncenso.Domain.AssemblyInfoInputs.cache
+C:\Users\Pichau\Projetins\Estoque\estoque-incenso\backend\EstoqueIncenso.Domain\obj\Debug\net10.0\EstoqueIncenso.Domain.AssemblyInfo.cs
+C:\Users\Pichau\Projetins\Estoque\estoque-incenso\backend\EstoqueIncenso.Domain\obj\Debug\net10.0\EstoqueIncenso.Domain.csproj.CoreCompileInputs.cache
+C:\Users\Pichau\Projetins\Estoque\estoque-incenso\backend\EstoqueIncenso.Domain\obj\Debug\net10.0\EstoqueIncenso.Domain.dll
+C:\Users\Pichau\Projetins\Estoque\estoque-incenso\backend\EstoqueIncenso.Domain\obj\Debug\net10.0\refint\EstoqueIncenso.Domain.dll
+C:\Users\Pichau\Projetins\Estoque\estoque-incenso\backend\EstoqueIncenso.Domain\obj\Debug\net10.0\EstoqueIncenso.Domain.pdb
+C:\Users\Pichau\Projetins\Estoque\estoque-incenso\backend\EstoqueIncenso.Domain\obj\Debug\net10.0\ref\EstoqueIncenso.Domain.dll
