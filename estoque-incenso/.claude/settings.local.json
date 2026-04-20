@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mkdir -p \"c:/Users/Pichau/Projetins/Estoque/estoque-incenso/backend/EstoqueIncenso.Api/Middleware\")",
+      "Bash(mkdir -p \"c:/Users/Pichau/Projetins/Estoque/estoque-incenso/backend/EstoqueIncenso.Api/Controladores\")"
+    ]
+  }
+}
