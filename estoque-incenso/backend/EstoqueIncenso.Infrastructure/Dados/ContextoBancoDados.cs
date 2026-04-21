@@ -22,11 +22,11 @@ public class ContextoBancoDados : DbContext
         {
             entity.ToTable("funcionarias");
             entity.HasKey(f => f.Id);
-            entity.Property(f => f.Id).ValueGeneratedOnAdd();
-            entity.Property(f => f.Nome)
+            entity.Property(f => f.Id).HasColumnName("id").ValueGeneratedOnAdd();
+            entity.Property(f => f.Nome).HasColumnName("nome")
                 .IsRequired()
                 .HasMaxLength(100);
-            entity.Property(f => f.Ativa)
+            entity.Property(f => f.Ativa).HasColumnName("ativa")
                 .IsRequired()
                 .HasDefaultValue(true);
             entity.HasIndex(f => f.Nome)
@@ -57,20 +57,20 @@ public class ContextoBancoDados : DbContext
             });
 
             entity.HasKey(r => r.Id);
-            entity.Property(r => r.Id).ValueGeneratedOnAdd();
+            entity.Property(r => r.Id).HasColumnName("id").ValueGeneratedOnAdd();
 
-            entity.Property(r => r.FuncionariaId).IsRequired();
-            entity.Property(r => r.Data).IsRequired();
-            entity.Property(r => r.Quantidade).IsRequired(false);
-            entity.Property(r => r.Falta)
+            entity.Property(r => r.FuncionariaId).HasColumnName("funcionaria_id").IsRequired();
+            entity.Property(r => r.Data).HasColumnName("data").IsRequired();
+            entity.Property(r => r.Quantidade).HasColumnName("quantidade").IsRequired(false);
+            entity.Property(r => r.Falta).HasColumnName("falta")
                 .IsRequired()
                 .HasDefaultValue(false);
-            entity.Property(r => r.ObservacaoFalta)
+            entity.Property(r => r.ObservacaoFalta).HasColumnName("observacao_falta")
                 .HasMaxLength(500)
                 .IsRequired(false);
 
             // MotivoFalta persistido como string (enum)
-            entity.Property(r => r.MotivoFalta)
+            entity.Property(r => r.MotivoFalta).HasColumnName("motivo_falta")
                 .HasConversion<string>()
                 .IsRequired(false);
 

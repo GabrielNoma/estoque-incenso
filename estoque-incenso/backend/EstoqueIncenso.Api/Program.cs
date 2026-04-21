@@ -47,6 +47,7 @@ builder.Services.AddScoped<IRepositorioRegistro, RepositorioRegistro>();
 // ── DI: Serviços ───────────────────────────────────────────────────────────
 builder.Services.AddScoped<IServicoFuncionaria, ServicoFuncionaria>();
 builder.Services.AddScoped<IServicoRegistro, ServicoRegistro>();
+builder.Services.AddScoped<IServicoExportacao, ServicoExportacao>();
 
 // ──────────────────────────────────────────────────────────────────────────
 var app = builder.Build();
