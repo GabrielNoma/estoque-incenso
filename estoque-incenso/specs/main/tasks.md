@@ -40,7 +40,7 @@ description: "Task list — Controle de Produção Diária"
 - [X] T007 [P] Criar entidade `RegistroDiario` em `backend/EstoqueIncenso.Domain/Entidades/RegistroDiario.cs` (Id, FuncionariaId, Data, Quantidade, Falta, MotivoFalta, ObservacaoFalta)
 - [X] T008 [P] Criar enum `MotivoFalta` em `backend/EstoqueIncenso.Domain/Enums/MotivoFalta.cs` (Atestado=1, Falta=2, Outro=3)
 - [X] T009 Criar `ContextoBancoDados` em `backend/EstoqueIncenso.Infrastructure/Dados/ContextoBancoDados.cs` com mapeamento EF Core, unique constraint `(FuncionariaId, Data)` e CHECK constraints do data-model
-- [ ] T010 Criar e aplicar migration inicial via EF Core: `dotnet ef migrations add InitialSchema --project EstoqueIncenso.Infrastructure --startup-project EstoqueIncenso.Api`
+- [X] T010 Criar e aplicar migration inicial via EF Core: `dotnet ef migrations add InitialSchema --project EstoqueIncenso.Infrastructure --startup-project EstoqueIncenso.Api` ✅ (HasColumnName() snake_case adicionado; migration recriada e aplicada)
 - [X] T011 Criar `MidlwareExcecoes` em `backend/EstoqueIncenso.Api/Middleware/MidlwareExcecoes.cs` com `ILogger` — log de exceção + response JSON padronizado (Constituição Princípio III)
 - [X] T012 Registrar middleware, CORS, DbContext e serviços de DI em `backend/EstoqueIncenso.Api/Program.cs`
 - [X] T013 [P] Criar `ErrorInterceptor` Angular em `frontend/src/app/shared/interceptors/error.interceptor.ts` — captura erros HTTP e exibe `MatSnackBar` (Constituição Princípio III)
@@ -87,10 +87,10 @@ description: "Task list — Controle de Produção Diária"
 
 ### Frontend
 
-- [ ] T025 [P] [US2] Criar `ProducaoService` Angular em `frontend/src/app/features/producao/producao.service.ts` — getGrade(ano, mes), upsertRegistro, deleteRegistro
-- [ ] T026 [P] [US2] Criar `MesSelectorComponent` em `frontend/src/app/shared/components/mes-selector/mes-selector.component.ts` — seletor mês/ano com `MatSelect`, emite evento ao mudar
-- [ ] T027 [US2] Criar `CelulaProducaoComponent` em `frontend/src/app/features/producao/celula-producao/celula-producao.component.ts` — `<input type="number">` com auto-save em `blur` (debounce 500ms), mantém valor anterior para rollback em caso de erro de rede
-- [ ] T028 [US2] Criar `GradeProducaoComponent` em `frontend/src/app/features/producao/grade-producao/grade-producao.component.ts` e `.html` — tabela `<mat-table>` ou `<table>` com: linhas por funcionária ativa, colunas por dia do mês, colunas de total semanal, coluna de total mensal, linha de total do dia no rodapé; fim de semana com estilo visual diferenciado
+- [X] T025 [P] [US2] Criar `ProducaoService` Angular em `frontend/src/app/features/producao/producao.service.ts` — getGrade(ano, mes), upsertRegistro, deleteRegistro ✅
+- [X] T026 [P] [US2] Criar `MesSelectorComponent` em `frontend/src/app/shared/components/mes-selector/mes-selector.component.ts` — seletor mês/ano com `MatSelect`, emite evento ao mudar ✅
+- [X] T027 [US2] Criar `CelulaProducaoComponent` em `frontend/src/app/features/producao/celula-producao/celula-producao.component.ts` — `<input type="number">` com auto-save em `blur` (debounce 500ms), mantém valor anterior para rollback em caso de erro de rede ✅
+- [X] T028 [US2] Criar `GradeProducaoComponent` em `frontend/src/app/features/producao/grade-producao/grade-producao.component.ts` e `.html` — tabela `<mat-table>` ou `<table>` com: linhas por funcionária ativa, colunas por dia do mês, colunas de total semanal, coluna de total mensal, linha de total do dia no rodapé; fim de semana com estilo visual diferenciado ✅
 
 **Checkpoint**: US1 + US2 independentemente funcionais.
 
@@ -102,9 +102,9 @@ description: "Task list — Controle de Produção Diária"
 
 **Independent Test**: Na grade → clicar no ícone de falta de uma célula → diálogo abre → selecionar "Atestado" → confirmar → célula exibe ícone/cor de falta → total do dia NÃO muda.
 
-- [ ] T029 [P] [US3] Criar `DialogoFaltaComponent` em `frontend/src/app/features/producao/dialogo-falta/dialogo-falta.component.ts` — `MatDialog` com `MatRadioGroup` para motivo (Atestado, Falta, Outro) e `MatInput` para observação (obrigatório quando Outro, max 500 chars); reactive form com validação
-- [ ] T030 [US3] Integrar `DialogoFaltaComponent` ao `CelulaProducaoComponent`: botão de falta na célula abre o diálogo; ao confirmar chama `ProducaoService.upsertRegistro` com `falta: true`; célula exibe "FALTA" com cor/ícone diferenciado e não mostra input numérico
-- [ ] T031 [US3] Adicionar relatório de faltas do mês por funcionária no `GradeProducaoComponent` ou painel lateral: lista com funcionária, data e motivo
+- [X] T029 [P] [US3] Criar `DialogoFaltaComponent` em `frontend/src/app/features/producao/dialogo-falta/dialogo-falta.component.ts` — `MatDialog` com `MatRadioGroup` para motivo (Atestado, Falta, Outro) e `MatInput` para observação (obrigatório quando Outro, max 500 chars); reactive form com validação ✅
+- [X] T030 [US3] Integrar `DialogoFaltaComponent` ao `CelulaProducaoComponent`: botão de falta na célula abre o diálogo; ao confirmar chama `ProducaoService.upsertRegistro` com `falta: true`; célula exibe "FALTA" com cor/ícone diferenciado e não mostra input numérico ✅
+- [X] T031 [US3] Adicionar relatório de faltas do mês por funcionária no `GradeProducaoComponent` ou painel lateral: lista com funcionária, data e motivo ✅ (incluído no ResumoMensalComponent)
 
 **Checkpoint**: US1 + US2 + US3 independentemente funcionais.
 
@@ -116,8 +116,8 @@ description: "Task list — Controle de Produção Diária"
 
 **Independent Test**: Grade aberta no mês atual → usar seletor → selecionar mês anterior → grade recarrega com dados históricos → editar uma célula → valor persiste ao voltar para o mesmo mês.
 
-- [ ] T032 [US4] Conectar `MesSelectorComponent` ao `GradeProducaoComponent` em `frontend/src/app/features/producao/grade-producao/grade-producao.component.ts` — ao mudar mês/ano: chamar `ProducaoService.getGrade(ano, mes)` e renderizar nova grade; inicializar com mês/ano atual
-- [ ] T033 [US4] Garantir que o backend suporte edição de meses passados: `RegistroService.Upsert` não deve restringir por data — qualquer mês pode ser editado (verificar sem restrição de data no service)
+- [X] T032 [US4] Conectar `MesSelectorComponent` ao `GradeProducaoComponent` em `frontend/src/app/features/producao/grade-producao/grade-producao.component.ts` — ao mudar mês/ano: chamar `ProducaoService.getGrade(ano, mes)` e renderizar nova grade; inicializar com mês/ano atual ✅
+- [X] T033 [US4] Garantir que o backend suporte edição de meses passados: `RegistroService.Upsert` não deve restringir por data — qualquer mês pode ser editado (verificar sem restrição de data no service) ✅ (verificado — sem restrição de data)
 
 **Checkpoint**: US1–US4 independentemente funcionais; grade completa e navegável.
 
@@ -129,8 +129,8 @@ description: "Task list — Controle de Produção Diária"
 
 **Independent Test**: Grade de abril exibida → painel de resumo mostra: total de Ana = 850, total geral = 1470, Ana: 1 atestado.
 
-- [ ] T034 [P] [US5] Criar `ResumoMensalComponent` em `frontend/src/app/features/producao/resumo-mensal/resumo-mensal.component.ts` e `.html` — exibe: tabela de total por funcionária, total geral da empresa, tabela de faltas por funcionária com breakdown (atestado / falta / outro); atualiza automaticamente quando grade muda
-- [ ] T035 [US5] Calcular totais de resumo no frontend a partir do `GradeMensalDto` já retornado pelo `GET /api/registros` — sem endpoint adicional necessário
+- [X] T034 [P] [US5] Criar `ResumoMensalComponent` em `frontend/src/app/features/producao/resumo-mensal/resumo-mensal.component.ts` e `.html` — exibe: tabela de total por funcionária, total geral da empresa, tabela de faltas por funcionária com breakdown (atestado / falta / outro); atualiza automaticamente quando grade muda ✅
+- [X] T035 [US5] Calcular totais de resumo no frontend a partir do `GradeMensalDto` já retornado pelo `GET /api/registros` — sem endpoint adicional necessário ✅
 
 **Checkpoint**: US1–US5 independentemente funcionais.
 
@@ -144,12 +144,12 @@ description: "Task list — Controle de Produção Diária"
 
 ### Backend
 
-- [ ] T036 [P] [US6] Criar `ExportacaoService` em `backend/EstoqueIncenso.Application/Services/ExportacaoService.cs` usando EPPlus 7: aba Produção (grade funcionária×dia com totais, estilo: fim de semana cinza, falta amarelo, total negrito), aba Faltas (lista com funcionária, data, motivo, observação) com `ILogger`
-- [ ] T037 [US6] Criar `ExportacaoController` em `backend/EstoqueIncenso.Api/Controllers/ExportacaoController.cs` com rota `GET /api/exportacao/excel?ano=&mes=` — retorna `FileContentResult` com Content-Type `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` e Content-Disposition com nome sugerido
+- [X] T036 [P] [US6] Criar `ExportacaoService` em `backend/EstoqueIncenso.Application/Servicos/ServicoExportacao.cs` usando EPPlus 8.5.3: aba Produção (grade funcionária×dia com totais, estilo: fim de semana cinza, falta amarelo, total negrito), aba Faltas (lista com funcionária, data, motivo, observação) com `ILogger` ✅
+- [X] T037 [US6] Criar `ControladorExportacao` em `backend/EstoqueIncenso.Api/Controladores/ControladorExportacao.cs` com rota `GET /api/exportacao/excel?ano=&mes=` — retorna `FileContentResult` com Content-Type `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` e Content-Disposition com nome sugerido ✅
 
 ### Frontend
 
-- [ ] T038 [US6] Criar `ExportacaoService` Angular em `frontend/src/app/features/producao/exportacao.service.ts` — chamada HTTP com `responseType: 'blob'` e trigger de download no browser; adicionar botão "Exportar Excel" no `GradeProducaoComponent`
+- [X] T038 [US6] Criar `ExportacaoService` Angular em `frontend/src/app/features/producao/exportacao/exportacao.service.ts` — chamada HTTP com `responseType: 'blob'` e trigger de download no browser; botão "Exportar Excel" no `GradeProducaoComponent` ✅
 
 **Checkpoint**: todas as 6 user stories funcionais e independentemente testáveis.
 
@@ -159,9 +159,9 @@ description: "Task list — Controle de Produção Diária"
 
 **Objetivo**: refinamentos visuais, publicação e conformidade constitucional.
 
-- [ ] T039 [P] Adicionar estilo SCSS para fins de semana na grade (fundo cinza claro) e para células de falta (fundo/ícone) em `frontend/src/app/features/producao/grade-producao/grade-producao.component.scss`
-- [ ] T040 [P] Configurar Angular production build copiando `dist/` para `backend/EstoqueIncenso.Api/wwwroot/` conforme `quickstart.md` — validar serve estático via .NET
-- [ ] T041 Revisão de conformidade constitucional: verificar que todos os Controllers são finos (sem lógica de negócio), todos os Services têm `ILogger<T>`, nenhum catch vazio existe no codebase (Constituição Princípios II e III)
+- [X] T039 [P] Adicionar estilo SCSS para fins de semana na grade (fundo cinza claro `#f5f5f5`) e para células de falta (fundo amarelo `#fff9c4`) — implementado inline nos componentes ✅
+- [X] T040 [P] Configurar Angular production build copiando `dist/` para `backend/EstoqueIncenso.Api/wwwroot/` conforme `quickstart.md` — serve estático via .NET configurado com `UseDefaultFiles` + `UseStaticFiles` + `MapFallbackToFile` ✅
+- [X] T041 Revisão de conformidade constitucional: todos os Controllers são finos, todos os Services têm `ILogger<T>`, nenhum catch vazio ✅ (verificado por agente de backend)
 - [ ] T042 [P] Validar checklist completo do `specs/main/quickstart.md` — executar todos os 7 critérios de aceite manualmente
 
 ---
