@@ -4,6 +4,7 @@ using EstoqueIncenso.Application.Servicos;
 using EstoqueIncenso.Infrastructure.Dados;
 using EstoqueIncenso.Infrastructure.Repositorios;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,6 +60,7 @@ app.UseMiddleware<MidlwareExcecoes>();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 // ── CORS ───────────────────────────────────────────────────────────────────
