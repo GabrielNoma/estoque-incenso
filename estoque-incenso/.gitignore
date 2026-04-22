@@ -7,6 +7,9 @@ frontend/dist/
 frontend/node_modules/
 frontend/.angular/
 
+# Build artifacts
+**/wwwroot/
+
 # IDE
 .vs/
 *.user
