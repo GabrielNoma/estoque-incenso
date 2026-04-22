@@ -27,7 +27,7 @@ interface ResumoFuncionaria {
 
         <div class="total-geral">
           <span class="label-total">Total geral produzido</span>
-          <span class="valor-total">{{ totalGeral }}</span>
+          <span class="valor-total">{{ totalGeral }} dz</span>
         </div>
 
         <mat-divider style="margin: 12px 0" />
@@ -40,9 +40,9 @@ interface ResumoFuncionaria {
           </ng-container>
 
           <ng-container matColumnDef="totalProduzido">
-            <th mat-header-cell *matHeaderCellDef>Produção</th>
-            <td mat-cell *matCellDef="let r">{{ r.totalProduzido }}</td>
-            <td mat-footer-cell *matFooterCellDef><strong>{{ totalGeral }}</strong></td>
+            <th mat-header-cell *matHeaderCellDef>Produção (dz)</th>
+            <td mat-cell *matCellDef="let r">{{ r.totalProduzido }} dz</td>
+            <td mat-footer-cell *matFooterCellDef><strong>{{ totalGeral }} dz</strong></td>
           </ng-container>
 
           <ng-container matColumnDef="atestados">

@@ -42,6 +42,7 @@ export interface AbrirFaltaEvento {
           (input)="aoDigitar($event)"
           (blur)="aoSair()"
           class="input-quantidade"
+          placeholder="dz"
           [disabled]="fimDeSemana"
         />
         <button mat-icon-button class="btn-falta" (click)="abrirFalta()" matTooltip="Registrar falta" [disabled]="fimDeSemana">

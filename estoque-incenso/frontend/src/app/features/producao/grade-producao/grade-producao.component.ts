@@ -46,7 +46,7 @@ import { ResumoMensalComponent } from '../resumo-mensal/resumo-mensal.component'
                 class="col-dia">
               {{ dia }}
             </th>
-            <th class="col-total">Total</th>
+            <th class="col-total">Total (dz)</th>
           </tr>
         </thead>
         <tbody>
@@ -63,16 +63,16 @@ import { ResumoMensalComponent } from '../resumo-mensal/resumo-mensal.component'
                 (excluir)="aoExcluir($event)"
               />
             </td>
-            <td class="col-total">{{ totalFuncionaria(func) }}</td>
+            <td class="col-total">{{ totalFuncionaria(func) }} dz</td>
           </tr>
         </tbody>
         <tfoot>
           <tr>
             <td class="col-nome"><strong>TOTAL</strong></td>
             <td *ngFor="let dia of dias()" [class.fim-de-semana]="eFimDeSemana(dia)" class="total-dia">
-              <strong>{{ totalDia(dia) }}</strong>
+              <strong>{{ totalDia(dia) > 0 ? totalDia(dia) + ' dz' : '' }}</strong>
             </td>
-            <td class="col-total"><strong>{{ totalGeral() }}</strong></td>
+            <td class="col-total"><strong>{{ totalGeral() }} dz</strong></td>
           </tr>
         </tfoot>
       </table>
