@@ -1,7 +1,0 @@
-<Solution>
-  <Project Path="EstoqueIncenso.Api/EstoqueIncenso.Api.csproj" />
-  <Project Path="EstoqueIncenso.Application/EstoqueIncenso.Application.csproj" />
-  <Project Path="EstoqueIncenso.Domain/EstoqueIncenso.Domain.csproj" />
-  <Project Path="EstoqueIncenso.Infrastructure/EstoqueIncenso.Infrastructure.csproj" />
-  <Project Path="EstoqueIncenso.Tests/EstoqueIncenso.Tests.csproj" />
-</Solution>

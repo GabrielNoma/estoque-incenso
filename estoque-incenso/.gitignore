@@ -1,18 +1,11 @@
-# .NET
-**/bin/
-**/obj/
+# Node.js (backend Fastify)
+backend/node_modules/
+backend/.env
 
 # Angular
 frontend/dist/
 frontend/node_modules/
 frontend/.angular/
-
-# Build artifacts
-**/wwwroot/
-
-# Node.js (backend Fastify)
-backend/node_modules/
-backend/.env
 
 # IDE
 .vs/

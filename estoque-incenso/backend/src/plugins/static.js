@@ -5,7 +5,7 @@ const fastifyStatic = require('@fastify/static')
 const path = require('path')
 const fs = require('fs')
 
-const distPath = path.join(__dirname, '../../../frontend/dist/browser')
+const distPath = path.join(__dirname, '../../../frontend/dist/frontend/browser')
 
 async function staticPlugin(fastify) {
   if (!fs.existsSync(distPath)) {
