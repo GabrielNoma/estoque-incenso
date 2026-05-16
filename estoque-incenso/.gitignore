@@ -10,6 +10,10 @@ frontend/.angular/
 # Build artifacts
 **/wwwroot/
 
+# Node.js (backend Fastify)
+backend/node_modules/
+backend/.env
+
 # IDE
 .vs/
 *.user

@@ -19,9 +19,9 @@
 
 **Purpose**: Inicialização do projeto Node.js e estrutura de diretórios
 
-- [ ] T001 Create backend directory structure: `backend/src/routes/`, `backend/src/plugins/`, `backend/src/db/` per plan.md
-- [ ] T002 Create `backend/package.json` with `"engines": { "node": ">=20" }`, Fastify 5, pg 8.x, ExcelJS 4.x, @fastify/cors, @fastify/static, dotenv as dependencies; `"main": "server.js"`; `"start": "node server.js"` script
-- [ ] T003 [P] Create `backend/.env.example` with DATABASE_URL=postgresql://user:pass@host:5432/dbname, PORT=3000, LOG_LEVEL=info, NODE_ENV=development
+- [x] T001 Create backend directory structure: `backend/src/routes/`, `backend/src/plugins/`, `backend/src/db/` per plan.md
+- [x] T002 Create `backend/package.json` with `"engines": { "node": ">=20" }`, Fastify 5, pg 8.x, ExcelJS 4.x, @fastify/cors, @fastify/static, dotenv as dependencies; `"main": "server.js"`; `"start": "node server.js"` script
+- [x] T003 [P] Create `backend/.env.example` with DATABASE_URL=postgresql://user:pass@host:5432/dbname, PORT=3000, LOG_LEVEL=info, NODE_ENV=development
 
 ---
 
@@ -31,12 +31,12 @@
 
 **⚠️ CRÍTICO**: Nenhum trabalho de user story pode começar antes desta fase
 
-- [ ] T004 Create `backend/src/db/schema.sql` with DDL completo: `CREATE TABLE IF NOT EXISTS funcionarias (id SERIAL PRIMARY KEY, nome VARCHAR(100) NOT NULL UNIQUE, ativa BOOLEAN NOT NULL DEFAULT true)` e `CREATE TABLE IF NOT EXISTS registros` com todas as colunas, constraints e `UNIQUE (funcionaria_id, ano, mes, dia)` conforme data-model.md
-- [ ] T005 Create `backend/src/plugins/db.js` as Fastify plugin: cria `pg.Pool({ connectionString: process.env.DATABASE_URL })`, registra via `fastify.decorate('db', pool)`, fecha pool no hook `onClose`
-- [ ] T006 [P] Create `backend/src/plugins/cors.js` as Fastify plugin registering `@fastify/cors` with `{ origin: true }` (permite todas as origens; restringir em produção se necessário)
-- [ ] T007 [P] Create `backend/src/plugins/static.js` as Fastify plugin registering `@fastify/static` with `{ root: path.join(__dirname, '../../frontend/dist/browser'), prefix: '/', wildcard: false }`; adiciona hook `onRequest` para servir `index.html` em rotas não-API (fallback para roteamento Angular)
-- [ ] T008 Create `backend/app.js`: cria instância Fastify com `{ logger: { level: process.env.LOG_LEVEL || 'info', timestamp: () => \`,"time":"\${new Date().toISOString()}"\` } }`; registra plugins db, cors e static via `fastify.register()`; registra rotas `funcionarias`, `registros` e `exportacao` com prefixo `/api`; exporta `app` (não faz listen)
-- [ ] T009 Create `backend/server.js`: carrega `require('dotenv').config()` apenas quando `process.env.NODE_ENV !== 'production'`; importa `app` de `./app.js`; chama `app.listen({ port: Number(process.env.PORT) || 3000, host: '0.0.0.0' })`; loga URL em sucesso; encerra processo em erro
+- [x] T004 Create `backend/src/db/schema.sql` with DDL completo: `CREATE TABLE IF NOT EXISTS funcionarias (id SERIAL PRIMARY KEY, nome VARCHAR(100) NOT NULL UNIQUE, ativa BOOLEAN NOT NULL DEFAULT true)` e `CREATE TABLE IF NOT EXISTS registros` com todas as colunas, constraints e `UNIQUE (funcionaria_id, ano, mes, dia)` conforme data-model.md
+- [x] T005 Create `backend/src/plugins/db.js` as Fastify plugin: cria `pg.Pool({ connectionString: process.env.DATABASE_URL })`, registra via `fastify.decorate('db', pool)`, fecha pool no hook `onClose`
+- [x] T006 [P] Create `backend/src/plugins/cors.js` as Fastify plugin registering `@fastify/cors` with `{ origin: true }` (permite todas as origens; restringir em produção se necessário)
+- [x] T007 [P] Create `backend/src/plugins/static.js` as Fastify plugin registering `@fastify/static` with `{ root: path.join(__dirname, '../../frontend/dist/browser'), prefix: '/', wildcard: false }`; adiciona hook `onRequest` para servir `index.html` em rotas não-API (fallback para roteamento Angular)
+- [x] T008 Create `backend/app.js`: cria instância Fastify com `{ logger: { level: process.env.LOG_LEVEL || 'info', timestamp: () => \`,"time":"\${new Date().toISOString()}"\` } }`; registra plugins db, cors e static via `fastify.register()`; registra rotas `funcionarias`, `registros` e `exportacao` com prefixo `/api`; exporta `app` (não faz listen)
+- [x] T009 Create `backend/server.js`: carrega `require('dotenv').config()` apenas quando `process.env.NODE_ENV !== 'production'`; importa `app` de `./app.js`; chama `app.listen({ port: Number(process.env.PORT) || 3000, host: '0.0.0.0' })`; loga URL em sucesso; encerra processo em erro
 
 **Checkpoint**: `node backend/server.js` inicia sem erros; `GET http://localhost:3000/api/funcionarias` retorna 404 (route files ainda não criados)
 
@@ -58,10 +58,10 @@
 
 ### Implementation
 
-- [ ] T010 [US1] Create `backend/src/routes/funcionarias.js` exporting async Fastify plugin; implement `GET /api/funcionarias`: `SELECT id, nome, ativa FROM funcionarias` com `WHERE ativa = true` quando `request.query.includeInactive` não é `'true'`; responde array JSON
-- [ ] T011 [US1] Add `POST /api/funcionarias` to `backend/src/routes/funcionarias.js`: valida `body.nome` não vazio; `INSERT INTO funcionarias (nome) VALUES ($1) RETURNING *`; captura erro PostgreSQL código `'23505'` (violação UNIQUE) e responde 409 `{ "error": "Funcionária com este nome já existe." }`; responde 201 com objeto inserido
-- [ ] T012 [US1] Add `PUT /api/funcionarias/:id` to `backend/src/routes/funcionarias.js`: `UPDATE funcionarias SET nome=$1 WHERE id=$2 RETURNING *`; se `result.rowCount === 0` responde 404; retorna 200 com registro atualizado
-- [ ] T013 [US1] Add `PATCH /api/funcionarias/:id/status` to `backend/src/routes/funcionarias.js`: `UPDATE funcionarias SET ativa=$1 WHERE id=$2 RETURNING *`; se `result.rowCount === 0` responde 404; retorna 200 com registro atualizado
+- [x] T010 [US1] Create `backend/src/routes/funcionarias.js` exporting async Fastify plugin; implement `GET /api/funcionarias`: `SELECT id, nome, ativa FROM funcionarias` com `WHERE ativa = true` quando `request.query.includeInactive` não é `'true'`; responde array JSON
+- [x] T011 [US1] Add `POST /api/funcionarias` to `backend/src/routes/funcionarias.js`: valida `body.nome` não vazio; `INSERT INTO funcionarias (nome) VALUES ($1) RETURNING *`; captura erro PostgreSQL código `'23505'` (violação UNIQUE) e responde 409 `{ "error": "Funcionária com este nome já existe." }`; responde 201 com objeto inserido
+- [x] T012 [US1] Add `PUT /api/funcionarias/:id` to `backend/src/routes/funcionarias.js`: `UPDATE funcionarias SET nome=$1 WHERE id=$2 RETURNING *`; se `result.rowCount === 0` responde 404; retorna 200 com registro atualizado
+- [x] T013 [US1] Add `PATCH /api/funcionarias/:id/status` to `backend/src/routes/funcionarias.js`: `UPDATE funcionarias SET ativa=$1 WHERE id=$2 RETURNING *`; se `result.rowCount === 0` responde 404; retorna 200 com registro atualizado
 
 **Checkpoint**: Todos os 4 endpoints respondem conforme contrato em `specs/002-migrate-node-fastify/contracts/funcionarias.md`
 
@@ -82,9 +82,9 @@
 
 ### Implementation
 
-- [ ] T014 [US2] Create `backend/src/routes/registros.js` exporting async Fastify plugin; implement `GET /api/registros`: valida query params `ano` e `mes` (inteiros, obrigatórios); executa JOIN `funcionarias LEFT JOIN registros ON ...` filtrando por ano e mes (inclui funcionárias ativas + inativas com registro no mês); agrupa registros por funcionária em JS; converte colunas snake_case → camelCase (`funcionaria_id` → `funcionariaId`, `motivo_falta` → `motivoFalta`, `observacao_falta` → `observacaoFalta`) e `(ano, mes, dia)` → `"YYYY-MM-DD"` na field `data`; responde `{ ano, mes, funcionarias: [...] }`
-- [ ] T015 [US2] Add `PUT /api/registros` to `backend/src/routes/registros.js`: aplica todas as validações do data-model.md em ordem — quantidade + falta simultâneos → 400 `"Quantidade e falta não podem ser informados simultaneamente."`; falta sem motivoFalta → 400 `"Motivo de falta é obrigatório."`; motivoFalta 'outro' sem observacaoFalta → 400 `"Observação é obrigatória para motivo 'Outro'."` ; quantidade < 0 → 400; converte `data` ISO → `(ano, mes, dia)`; verifica funcionária existe (404); executa `INSERT INTO registros ... ON CONFLICT (funcionaria_id, ano, mes, dia) DO UPDATE SET ... RETURNING *`; retorna 200 com registro em camelCase
-- [ ] T016 [US2] Add `DELETE /api/registros/:id` to `backend/src/routes/registros.js`: `DELETE FROM registros WHERE id=$1`; se `result.rowCount === 0` responde 404; responde 204 sem body
+- [x] T014 [US2] Create `backend/src/routes/registros.js` exporting async Fastify plugin; implement `GET /api/registros`: valida query params `ano` e `mes` (inteiros, obrigatórios); executa JOIN `funcionarias LEFT JOIN registros ON ...` filtrando por ano e mes (inclui funcionárias ativas + inativas com registro no mês); agrupa registros por funcionária em JS; converte colunas snake_case → camelCase (`funcionaria_id` → `funcionariaId`, `motivo_falta` → `motivoFalta`, `observacao_falta` → `observacaoFalta`) e `(ano, mes, dia)` → `"YYYY-MM-DD"` na field `data`; responde `{ ano, mes, funcionarias: [...] }`
+- [x] T015 [US2] Add `PUT /api/registros` to `backend/src/routes/registros.js`: aplica todas as validações do data-model.md em ordem — quantidade + falta simultâneos → 400 `"Quantidade e falta não podem ser informados simultaneamente."`; falta sem motivoFalta → 400 `"Motivo de falta é obrigatório."`; motivoFalta 'outro' sem observacaoFalta → 400 `"Observação é obrigatória para motivo 'Outro'."` ; quantidade < 0 → 400; converte `data` ISO → `(ano, mes, dia)`; verifica funcionária existe (404); executa `INSERT INTO registros ... ON CONFLICT (funcionaria_id, ano, mes, dia) DO UPDATE SET ... RETURNING *`; retorna 200 com registro em camelCase
+- [x] T016 [US2] Add `DELETE /api/registros/:id` to `backend/src/routes/registros.js`: `DELETE FROM registros WHERE id=$1`; se `result.rowCount === 0` responde 404; responde 204 sem body
 
 **Checkpoint**: Grade de produção do frontend Angular carrega, salva e exclui registros corretamente via novo backend Fastify
 
@@ -107,7 +107,7 @@
 
 ### Implementation
 
-- [ ] T017 [US3] Create `backend/src/routes/exportacao.js` exporting async Fastify plugin; implement `GET /api/exportacao/excel`: valida `ano` e `mes` obrigatórios e inteiros válidos (400 se inválidos); executa a mesma query de registros de US2 (JOIN funcionarias + registros por ano e mes); usa ExcelJS — cria `new ExcelJS.Workbook()`; aba **"Produção"**: linha de cabeçalho com "Funcionária" + dias 1–N do mês com colunas "Sem X" intercaladas após último dia de cada semana ISO + "Total"; para cada funcionária, preenche quantidade ou "FALTA" por dia; aplica estilos (fundo amarelo em falta `FFFF00`, cinza claro em fim de semana `D3D3D3`, azul claro em semana ISO `BDD7EE`, negrito em totais e linha de total do dia, fundo cinza na linha de total `C0C0C0`); adiciona linha "TOTAL DIA" ao final; aba **"Faltas"**: cabeçalho [Funcionária, Data, Motivo, Observação] + rows de registros com `falta=true`; gera buffer com `workbook.xlsx.writeBuffer()`; define headers `Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` e `Content-Disposition: attachment; filename="producao_YYYY_MM.xlsx"`; responde com buffer
+- [x] T017 [US3] Create `backend/src/routes/exportacao.js` exporting async Fastify plugin; implement `GET /api/exportacao/excel`: valida `ano` e `mes` obrigatórios e inteiros válidos (400 se inválidos); executa a mesma query de registros de US2 (JOIN funcionarias + registros por ano e mes); usa ExcelJS — cria `new ExcelJS.Workbook()`; aba **"Produção"**: linha de cabeçalho com "Funcionária" + dias 1–N do mês com colunas "Sem X" intercaladas após último dia de cada semana ISO + "Total"; para cada funcionária, preenche quantidade ou "FALTA" por dia; aplica estilos (fundo amarelo em falta `FFFF00`, cinza claro em fim de semana `D3D3D3`, azul claro em semana ISO `BDD7EE`, negrito em totais e linha de total do dia, fundo cinza na linha de total `C0C0C0`); adiciona linha "TOTAL DIA" ao final; aba **"Faltas"**: cabeçalho [Funcionária, Data, Motivo, Observação] + rows de registros com `falta=true`; gera buffer com `workbook.xlsx.writeBuffer()`; define headers `Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` e `Content-Disposition: attachment; filename="producao_YYYY_MM.xlsx"`; responde com buffer
 
 **Checkpoint**: Download do Excel gera arquivo com estrutura e estilos equivalentes ao comportamento atual do backend C#
 
@@ -124,7 +124,7 @@
 
 ### Implementation
 
-- [ ] T018 [US4] Create `.github/workflows/deploy.yml`: trigger `on: push: branches: [main]`; job `build-and-deploy` rodando em `ubuntu-latest`; steps: (1) `actions/checkout@v4`; (2) `actions/setup-node@v4` com `node-version: '20'`; (3) `npm ci` no diretório `backend/`; (4) `npm ci` no diretório `frontend/`; (5) `npm run build` no diretório `frontend/` (gera `frontend/dist/browser`); (6) `curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"` e valida status 201; adiciona comentário no YAML documentando que `RENDER_DEPLOY_HOOK_URL` deve ser configurado em GitHub Settings → Secrets
+- [x] T018 [US4] Create `.github/workflows/deploy.yml`: trigger `on: push: branches: [main]`; job `build-and-deploy` rodando em `ubuntu-latest`; steps: (1) `actions/checkout@v4`; (2) `actions/setup-node@v4` com `node-version: '20'`; (3) `npm ci` no diretório `backend/`; (4) `npm ci` no diretório `frontend/`; (5) `npm run build` no diretório `frontend/` (gera `frontend/dist/browser`); (6) `curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}"` e valida status 201; adiciona comentário no YAML documentando que `RENDER_DEPLOY_HOOK_URL` deve ser configurado em GitHub Settings → Secrets
 
 **Checkpoint**: `deploy.yml` aprovado por GitHub Actions syntax check; segredo necessário documentado
 
@@ -134,8 +134,8 @@
 
 **Purpose**: Validação cruzada e verificação de todos os critérios de aceite do spec
 
-- [ ] T019 [P] Verify all 8 API endpoints in `backend/src/routes/` against contracts in `specs/002-migrate-node-fastify/contracts/` — confirma paths, métodos HTTP, query params, formatos de response (camelCase), HTTP status codes e mensagens de erro estão corretos
-- [ ] T020 [P] Verify `backend/app.js` registers all 3 route files (funcionarias, registros, exportacao) and all 3 plugins (db, cors, static) with Fastify plugin encapsulation; verifica que rotas `/api/*` têm prioridade sobre static file serving
+- [x] T019 [P] Verify all 8 API endpoints in `backend/src/routes/` against contracts in `specs/002-migrate-node-fastify/contracts/` — confirma paths, métodos HTTP, query params, formatos de response (camelCase), HTTP status codes e mensagens de erro estão corretos
+- [x] T020 [P] Verify `backend/app.js` registers all 3 route files (funcionarias, registros, exportacao) and all 3 plugins (db, cors, static) with Fastify plugin encapsulation; verifica que rotas `/api/*` têm prioridade sobre static file serving
 - [ ] T021 Run quickstart.md validation: execute os 8 cenários de verificação manual, confirme todos os 7 critérios de aceite do spec (endpoints, grade, Excel, frontend Angular sem alterações, GitHub Actions, Render, Supabase)
 
 ---

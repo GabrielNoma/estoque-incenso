@@ -1,0 +1,44 @@
+# Deploy: build Angular + trigger Render Deploy Hook
+# REQUIRED SECRET: RENDER_DEPLOY_HOOK_URL
+#   Configure em: GitHub → Settings → Secrets and variables → Actions → New repository secret
+#   Valor: URL do Deploy Hook gerado no painel do Render (Settings → Deploy Hooks)
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build Angular
+        working-directory: frontend
+        run: npm run build
+
+      - name: Trigger Render Deploy Hook
+        run: |
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}")
+          echo "Render Deploy Hook status: $STATUS"
+          if [ "$STATUS" != "201" ]; then
+            echo "Render Deploy Hook falhou com status $STATUS"
+            exit 1
+          fi
