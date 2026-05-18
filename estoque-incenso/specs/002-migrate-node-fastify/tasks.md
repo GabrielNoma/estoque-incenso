@@ -136,7 +136,7 @@
 
 - [x] T019 [P] Verify all 8 API endpoints in `backend/src/routes/` against contracts in `specs/002-migrate-node-fastify/contracts/` — confirma paths, métodos HTTP, query params, formatos de response (camelCase), HTTP status codes e mensagens de erro estão corretos
 - [x] T020 [P] Verify `backend/app.js` registers all 3 route files (funcionarias, registros, exportacao) and all 3 plugins (db, cors, static) with Fastify plugin encapsulation; verifica que rotas `/api/*` têm prioridade sobre static file serving
-- [ ] T021 Run quickstart.md validation: execute os 8 cenários de verificação manual, confirme todos os 7 critérios de aceite do spec (endpoints, grade, Excel, frontend Angular sem alterações, GitHub Actions, Render, Supabase)
+- [x] T021 Run quickstart.md validation: execute os 8 cenários de verificação manual, confirme todos os 7 critérios de aceite do spec (endpoints, grade, Excel, frontend Angular sem alterações, GitHub Actions, Render, Supabase)
 
 ---
 

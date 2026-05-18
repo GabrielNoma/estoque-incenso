@@ -2,30 +2,33 @@
 
 ## Mudanças de modelo
 
-**Nenhuma mudança no schema do banco de dados.** A migração é exclusivamente de runtime (C# → Node.js). As tabelas, constraints e índices permanecem idênticos.
+A migração é exclusivamente de runtime (C# → Node.js). As tabelas e índices permanecem os mesmos criados pelo EF Core, com uma diferença de nomenclatura: a tabela de registros usa `registros_diarios` com coluna `data DATE` (em vez de `registros` com `ano/mes/dia` inteiros previstos inicialmente). O `schema.sql` reflete o banco real.
 
-## Schema PostgreSQL (inalterado)
+## Schema PostgreSQL (banco existente + script para Supabase)
 
 ```sql
 -- Arquivo: backend/src/db/schema.sql
 
 CREATE TABLE IF NOT EXISTS funcionarias (
   id    SERIAL PRIMARY KEY,
-  nome  VARCHAR(100) NOT NULL UNIQUE,
-  ativa BOOLEAN      NOT NULL DEFAULT true
+  nome  VARCHAR(100) NOT NULL,
+  ativa BOOLEAN      NOT NULL DEFAULT true,
+  CONSTRAINT uq_funcionaria_nome UNIQUE (nome)
 );
 
-CREATE TABLE IF NOT EXISTS registros (
+CREATE TABLE IF NOT EXISTS registros_diarios (
   id               SERIAL  PRIMARY KEY,
-  funcionaria_id   INTEGER NOT NULL REFERENCES funcionarias(id),
-  ano              INTEGER NOT NULL,
-  mes              INTEGER NOT NULL CHECK (mes BETWEEN 1 AND 12),
-  dia              INTEGER NOT NULL CHECK (dia BETWEEN 1 AND 31),
-  quantidade       INTEGER          CHECK (quantidade >= 0),
+  funcionaria_id   INTEGER NOT NULL REFERENCES funcionarias(id) ON DELETE RESTRICT,
+  data             DATE    NOT NULL,
+  quantidade       INTEGER,
   falta            BOOLEAN NOT NULL DEFAULT false,
-  motivo_falta     VARCHAR(20)      CHECK (motivo_falta IN ('atestado', 'falta', 'outro')),
-  observacao_falta TEXT,
-  UNIQUE (funcionaria_id, ano, mes, dia)
+  motivo_falta     TEXT,
+  observacao_falta VARCHAR(500),
+  CONSTRAINT uq_registro_funcionaria_data  UNIQUE (funcionaria_id, data),
+  CONSTRAINT chk_quantidade_positiva       CHECK ((quantidade >= 0) OR (quantidade IS NULL)),
+  CONSTRAINT chk_exclusividade             CHECK (NOT ((quantidade IS NOT NULL) AND (falta = true))),
+  CONSTRAINT chk_motivo_quando_falta       CHECK (((falta = false) AND (motivo_falta IS NULL)) OR ((falta = true) AND (motivo_falta IS NOT NULL))),
+  CONSTRAINT chk_obs_quando_outro          CHECK ((motivo_falta <> 'outro') OR ((motivo_falta = 'outro') AND (observacao_falta IS NOT NULL) AND (observacao_falta <> '')))
 );
 ```
 
@@ -45,11 +48,11 @@ CREATE TABLE IF NOT EXISTS registros (
 |-------------------|-------------------|--------------|-------------------------------------------|
 | `id`              | `id`              | SERIAL / int | PK                                        |
 | `funcionariaId`   | `funcionaria_id`  | INTEGER      | FK → funcionarias.id                      |
-| `data`            | `ano`, `mes`, `dia` | INTEGER×3  | `"2026-04-03"` → `{ano:2026, mes:4, dia:3}` |
+| `data`            | `data`            | DATE         | `"2026-04-03"` → `TO_CHAR(data, 'YYYY-MM-DD')` |
 | `quantidade`      | `quantidade`      | INTEGER      | NULL se falta; ≥ 0                        |
 | `falta`           | `falta`           | BOOLEAN      | Default false                             |
-| `motivoFalta`     | `motivo_falta`    | VARCHAR(20)  | NULL se não é falta                       |
-| `observacaoFalta` | `observacao_falta`| TEXT         | Obrigatório se motivo = 'outro'           |
+| `motivoFalta`     | `motivo_falta`    | TEXT         | NULL se não é falta; valores: `'atestado'`, `'falta'`, `'outro'` |
+| `observacaoFalta` | `observacao_falta`| VARCHAR(500) | Obrigatório se motivo = 'outro'           |
 
 ## Regras de validação (camada de rota — não no banco)
 
@@ -65,12 +68,12 @@ CREATE TABLE IF NOT EXISTS registros (
 
 ## Conversão de data
 
-A API usa `"data": "YYYY-MM-DD"` (ISO 8601). O banco armazena `ano`, `mes`, `dia` como inteiros separados.
+A API usa `"data": "YYYY-MM-DD"` (ISO 8601). O banco armazena como coluna `DATE`.
 
 ```javascript
-// JSON → SQL
-const [ano, mes, dia] = req.body.data.split('-').map(Number)
+// JSON → SQL: passa a string ISO diretamente; PostgreSQL converte automaticamente
+await db.query('INSERT INTO registros_diarios (..., data, ...) VALUES (..., $1, ...)', [body.data])
 
-// SQL → JSON (na query GET /api/registros)
-data: `${r.ano}-${String(r.mes).padStart(2,'0')}-${String(r.dia).padStart(2,'0')}`
+// SQL → JSON: usa TO_CHAR na query
+TO_CHAR(r.data, 'YYYY-MM-DD') AS data_iso
 ```
