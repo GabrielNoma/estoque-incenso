@@ -3,7 +3,7 @@
 async function funcionariasRoutes(fastify) {
   // GET /api/funcionarias
   fastify.get('/funcionarias', async (request, reply) => {
-    const includeInactive = request.query.includeInactive === 'true'
+    const includeInactive = request.query.incluirInativas === 'true'
     const sql = includeInactive
       ? 'SELECT id, nome, ativa FROM funcionarias ORDER BY nome'
       : 'SELECT id, nome, ativa FROM funcionarias WHERE ativa = true ORDER BY nome'

@@ -4,9 +4,9 @@
 
 **Nenhuma mudança de modelo de dados.** Feature é exclusivamente de apresentação (UI).
 
-## Entidades existentes afetadas
+## Entidades existentes afetadas (sem alteração de schema)
 
-### `MesAno` (interface TypeScript — não muda)
+### `MesAno` (interface TypeScript — inalterada)
 
 ```typescript
 interface MesAno {
@@ -15,10 +15,12 @@ interface MesAno {
 }
 ```
 
-### Propriedade nova (lógica derivada, não persistida)
+## Lógica derivada adicionada (não persistida)
 
-| Propriedade | Tipo | Derivação | Uso |
-|-------------|------|-----------|-----|
-| `eHoje(dia)` | `boolean` | `mes === hoje.getMonth()+1 && ano === hoje.getFullYear() && dia === hoje.getDate()` | Adiciona classe CSS `dia-hoje` na coluna do dia atual |
+| Método/Campo | Tipo | Onde | Derivação |
+|---|---|---|---|
+| `eHoje(dia)` | `boolean` | `GradeProducaoComponent` | `grade.ano === hoje.getFullYear() && grade.mes === hoje.getMonth()+1 && dia === hoje.getDate()` |
+| `diaSemana(dia)` | `string` | `GradeProducaoComponent` | `['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'][new Date(ano, mes-1, dia).getDay()]` |
+| `_hoje` | `Date` | `GradeProducaoComponent` | `new Date()` capturado uma vez na construção do componente — imutável durante a sessão |
 
-Essa propriedade é calculada no componente `GradeProducaoComponent` — sem persistência, sem API.
+Todos os campos são calculados no componente — sem persistência, sem chamadas de API.

@@ -40,8 +40,8 @@ test('GET /api/funcionarias — retorna apenas ativas por padrão', async () => 
   assert.ok(!body.some(f => f.nome === 'TESTEF_inativa'))
 })
 
-test('GET /api/funcionarias?includeInactive=true — inclui inativas', async () => {
-  const res = await app.inject({ method: 'GET', url: '/api/funcionarias?includeInactive=true' })
+test('GET /api/funcionarias?incluirInativas=true — inclui inativas', async () => {
+  const res = await app.inject({ method: 'GET', url: '/api/funcionarias?incluirInativas=true' })
   const body = JSON.parse(res.body)
   assert.ok(body.some(f => f.nome === 'TESTEF_inativa'))
 })

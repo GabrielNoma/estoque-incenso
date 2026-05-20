@@ -39,9 +39,40 @@ export interface MesAno {
     </div>
   `,
   styles: [`
-    .mes-selector { display: flex; align-items: center; gap: 8px; }
-    .campo-mes { width: 140px; }
-    .campo-ano { width: 90px; }
+    .mes-selector { display: flex; align-items: center; gap: 2px; }
+    .campo-mes { width: 118px; }
+    .campo-ano { width: 86px; }
+
+    /* Remove espaço de hint/erro */
+    ::ng-deep .campo-mes .mat-mdc-form-field-subscript-wrapper,
+    ::ng-deep .campo-ano .mat-mdc-form-field-subscript-wrapper { display: none; }
+
+    /* Altura reduzida */
+    ::ng-deep .campo-mes .mat-mdc-form-field-flex,
+    ::ng-deep .campo-ano .mat-mdc-form-field-flex { height: 34px; align-items: center; }
+
+    /* Bordas pill */
+    ::ng-deep .campo-mes .mdc-notched-outline__leading,
+    ::ng-deep .campo-ano .mdc-notched-outline__leading {
+      border-radius: 17px 0 0 17px !important; min-width: 17px !important;
+    }
+    ::ng-deep .campo-mes .mdc-notched-outline__trailing,
+    ::ng-deep .campo-ano .mdc-notched-outline__trailing {
+      border-radius: 0 17px 17px 0 !important;
+    }
+
+    /* Borda mais fina */
+    ::ng-deep .campo-mes .mdc-notched-outline__leading,
+    ::ng-deep .campo-mes .mdc-notched-outline__notch,
+    ::ng-deep .campo-mes .mdc-notched-outline__trailing,
+    ::ng-deep .campo-ano .mdc-notched-outline__leading,
+    ::ng-deep .campo-ano .mdc-notched-outline__notch,
+    ::ng-deep .campo-ano .mdc-notched-outline__trailing { border-width: 1.5px; }
+
+    /* Texto centralizado e sem overflow */
+    ::ng-deep .campo-mes .mat-mdc-select-trigger,
+    ::ng-deep .campo-ano .mat-mdc-select-trigger { overflow: visible; }
+    ::ng-deep .campo-ano .mat-mdc-select-value { overflow: visible; text-overflow: unset; }
   `]
 })
 export class MesSelectorComponent implements OnInit {

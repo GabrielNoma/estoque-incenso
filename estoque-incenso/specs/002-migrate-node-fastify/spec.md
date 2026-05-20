@@ -1,4 +1,4 @@
-# Spec — Migração para Node.js + Fastify + Deploy Render/Supabase
+vamos c# Spec — Migração para Node.js + Fastify + Deploy Render/Supabase
 
 ## Visão geral
 

@@ -2,27 +2,37 @@
 
 ## Findings
 
-### 1. Estado atual do `mes-selector`
+### 1. Inicialização no mês/dia correntes
 
-**Decision:** O componente já inicializa com o mês/ano correntes via `new Date()`.
-**Rationale:** `mesAtual` em `grade-producao.component.ts` (linha 105) e o `@Input() valor` em `mes-selector.component.ts` (linha 48) ambos usam `new Date()`. RF01 e RF05 já estão satisfeitos.
-**Alternatives considered:** Persistir última posição navegada no localStorage — descartado pela spec (RF05: reload retorna para hoje).
+**Decision:** `GradeProducaoComponent.mesAtual` já é declarado com `new Date()`. `MesSelectorComponent` recebe o valor via `@Input() valor` e sincroniza no `ngOnInit`. RF01 e RF05 satisfeitos desde a estrutura inicial do componente.  
+**Rationale:** O pai é dono do estado de navegação; o filho apenas exibe. Fluxo unidirecional Angular (Input → Output) mantido.  
+**Alternatives considered:** Persistir última posição navegada no localStorage — descartado pelo RF05 (reload retorna para hoje).
 
 ### 2. Destaque visual do dia de hoje
 
-**Decision:** Adicionar classe CSS `dia-hoje` na célula da grade cujo número de dia corresponde a `new Date().getDate()` quando o mês/ano carregado for o mês/ano atual.
-**Rationale:** Padrão adotado em calendários web — CSS class condicional no template `*ngFor` da grade de dias. Solução simples, zero dependências novas.
-**Alternatives considered:** Angular Material `mat-badge` ou tooltip — desnecessariamente pesado para um destaque simples de coluna.
+**Decision:** Método `eHoje(dia: number): boolean` no `GradeProducaoComponent` compara `grade().ano/mes` com `new Date()` e aplica classe CSS `dia-hoje` em thead/tbody/tfoot via `[class.dia-hoje]="eHoje(dia)"`.  
+**Rationale:** CSS class condicional é o padrão Angular para highlights dinâmicos. Zero dependências novas, solução legível.  
+**Alternatives considered:** `mat-badge` ou tooltip — desnecessariamente pesado para um destaque de coluna.
 
-### 3. Compactação do `mes-selector`
+### 3. Scroll automático para hoje no carregamento
 
-**Decision:** Reduzir `campo-mes` de 140px → 110px, `campo-ano` de 90px → 72px, e adicionar `subscriptSizing: fixed` / `dense` para remover o espaço de subscript reservado pelo `mat-form-field` (principal responsável pelo tamanho excessivo).
-**Rationale:** O Angular Material `mat-form-field` reserva ~20px de altura extra abaixo do campo para mensagens de validação. Para campos sem validação, `subscriptSizing: "fixed"` e a remoção do padding inferior elimina esse espaço. Aplicar `appearance="outline"` com padding customizado reduz a altura total do campo.
-**Alternatives considered:**
-- Usar `mat-chip` ou botão com texto em vez de `mat-select` — mudaria o UX de forma mais invasiva, fora do escopo.
-- Mudar para `appearance="fill"` — visualmente diferente e não necessariamente mais compacto.
+**Decision:** `setTimeout(() => el?.scrollIntoView({behavior:'smooth', inline:'center'}))` no callback `next` do subscribe de `ngOnInit`.  
+**Rationale:** `*ngFor` renderiza as células _após_ `grade.set(g)` no próximo ciclo de detecção de mudança. `setTimeout` adia o `querySelector('.dia-hoje')` para depois desse ciclo — padrão idiomático Angular.  
+**Alternatives considered:** `afterNextRender` + `ChangeDetectorRef.detectChanges()` — mais verboso sem benefício real.
 
-### 4. Arquitetura de mudança — sem backend
+### 4. Compactação via `::ng-deep` com escopo no componente
 
-**Decision:** Feature é 100% frontend — zero mudanças no backend, API ou banco de dados.
-**Rationale:** Compactação visual e destaque de "hoje" são puramente apresentacionais. A API já retorna os dados do mês correto; o que muda é apenas como o frontend os exibe.
+**Decision:** `::ng-deep` escopado a `.campo-mes` / `.campo-ano` dentro do componente standalone para: ocultar `mat-mdc-form-field-subscript-wrapper`, reduzir altura do `mat-mdc-form-field-flex` para 34 px, aplicar bordas pill (`border-radius: 17px`), borda mais fina (1.5 px).  
+**Rationale:** Angular Material MDC 17 não expõe tokens de densidade de form-field granulares o suficiente para esse nível de compactação. `::ng-deep` escopado é a solução padrão documentada para personalização MDC em standalone components.  
+**Alternatives considered:** `mat.form-field-density(-2)` no tema global — modifica todos os form-fields do projeto, fora do escopo.
+
+### 5. Optimistic updates para evitar re-scroll
+
+**Decision:** `patchRegistroLocal` / `patchIdLocal` / `removerRegistroLocal` atualizam o signal `grade` localmente; `carregar()` é chamado apenas em erro.  
+**Rationale:** Sem optimistic updates, cada save dispararia `carregar()` → `ngOnInit` não é chamado novamente, mas o fato de recarregar a grade reposicionaria o scroll. O patch local mantém o scroll posicionado no dia de hoje após a primeira carga.  
+**Alternatives considered:** Flag booleano `jaRolou` para impedir re-scroll — mais estado para gerenciar; patch local resolve o problema de forma mais limpa.
+
+### 6. Arquitetura — zero mudanças no backend
+
+**Decision:** Feature 100% frontend — sem mudanças em API, banco de dados ou serviços Angular.  
+**Rationale:** Compactação e destaque de "hoje" são puramente apresentacionais. A API já retorna os dados do mês correto.
