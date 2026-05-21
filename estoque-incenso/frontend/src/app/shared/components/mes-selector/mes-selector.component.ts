@@ -17,62 +17,121 @@ export interface MesAno {
   imports: [CommonModule, FormsModule, MatSelectModule, MatFormFieldModule, MatButtonModule, MatIconModule],
   template: `
     <div class="mes-selector">
-      <button mat-icon-button (click)="navegar(-1)" matTooltip="Mês anterior">
+      <button mat-icon-button class="nav-btn" (click)="navegar(-1)" aria-label="Mês anterior">
         <mat-icon>chevron_left</mat-icon>
       </button>
 
-      <mat-form-field appearance="outline" class="campo-mes">
-        <mat-select [(ngModel)]="mesSelecionado" (ngModelChange)="emitir()">
-          <mat-option *ngFor="let m of meses" [value]="m.valor">{{ m.label }}</mat-option>
-        </mat-select>
-      </mat-form-field>
+      <div class="selects-group">
+        <mat-form-field appearance="outline" class="campo-mes compact">
+          <mat-select [(ngModel)]="mesSelecionado" (ngModelChange)="emitir()">
+            <mat-option *ngFor="let m of meses" [value]="m.valor">{{ m.label }}</mat-option>
+          </mat-select>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline" class="campo-ano">
-        <mat-select [(ngModel)]="anoSelecionado" (ngModelChange)="emitir()">
-          <mat-option *ngFor="let a of anos" [value]="a">{{ a }}</mat-option>
-        </mat-select>
-      </mat-form-field>
+        <mat-form-field appearance="outline" class="campo-ano compact">
+          <mat-select [(ngModel)]="anoSelecionado" (ngModelChange)="emitir()">
+            <mat-option *ngFor="let a of anos" [value]="a">{{ a }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
 
-      <button mat-icon-button (click)="navegar(1)" matTooltip="Próximo mês">
+      <button mat-icon-button class="nav-btn" (click)="navegar(1)" aria-label="Próximo mês">
         <mat-icon>chevron_right</mat-icon>
       </button>
     </div>
   `,
   styles: [`
-    .mes-selector { display: flex; align-items: center; gap: 2px; }
-    .campo-mes { width: 118px; }
-    .campo-ano { width: 86px; }
+    .mes-selector {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
 
-    /* Remove espaço de hint/erro */
+    .selects-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Botões de navegação */
+    .nav-btn {
+      width: 34px !important;
+      height: 34px !important;
+      padding: 5px !important;
+      color: var(--color-on-surface-muted);
+      transition: background-color var(--transition-fast), color var(--transition-fast);
+      border-radius: var(--radius-full) !important;
+
+      &:hover {
+        background: var(--color-surface-variant) !important;
+        color: var(--color-primary) !important;
+      }
+    }
+
+    /* Form fields */
+    .campo-mes { width: 122px; }
+    .campo-ano { width: 88px; }
+
+    /* Remove espaço do hint */
     ::ng-deep .campo-mes .mat-mdc-form-field-subscript-wrapper,
-    ::ng-deep .campo-ano .mat-mdc-form-field-subscript-wrapper { display: none; }
+    ::ng-deep .campo-ano .mat-mdc-form-field-subscript-wrapper {
+      display: none;
+    }
 
-    /* Altura reduzida */
+    /* Altura compacta */
     ::ng-deep .campo-mes .mat-mdc-form-field-flex,
-    ::ng-deep .campo-ano .mat-mdc-form-field-flex { height: 34px; align-items: center; }
+    ::ng-deep .campo-ano .mat-mdc-form-field-flex {
+      height: 36px;
+      align-items: center;
+    }
 
-    /* Bordas pill */
+    /* Padding interno */
+    ::ng-deep .campo-mes .mat-mdc-select-trigger,
+    ::ng-deep .campo-ano .mat-mdc-select-trigger {
+      padding: 0 8px;
+    }
+
+    /* Bordas arredondadas pill */
     ::ng-deep .campo-mes .mdc-notched-outline__leading,
     ::ng-deep .campo-ano .mdc-notched-outline__leading {
-      border-radius: 17px 0 0 17px !important; min-width: 17px !important;
+      border-radius: 18px 0 0 18px !important;
+      min-width: 18px !important;
     }
     ::ng-deep .campo-mes .mdc-notched-outline__trailing,
     ::ng-deep .campo-ano .mdc-notched-outline__trailing {
-      border-radius: 0 17px 17px 0 !important;
+      border-radius: 0 18px 18px 0 !important;
     }
 
-    /* Borda mais fina */
+    /* Cor da borda */
     ::ng-deep .campo-mes .mdc-notched-outline__leading,
     ::ng-deep .campo-mes .mdc-notched-outline__notch,
     ::ng-deep .campo-mes .mdc-notched-outline__trailing,
     ::ng-deep .campo-ano .mdc-notched-outline__leading,
     ::ng-deep .campo-ano .mdc-notched-outline__notch,
-    ::ng-deep .campo-ano .mdc-notched-outline__trailing { border-width: 1.5px; }
+    ::ng-deep .campo-ano .mdc-notched-outline__trailing {
+      border-width: 1.5px;
+      border-color: var(--color-border-strong) !important;
+    }
 
-    /* Texto centralizado e sem overflow */
-    ::ng-deep .campo-mes .mat-mdc-select-trigger,
-    ::ng-deep .campo-ano .mat-mdc-select-trigger { overflow: visible; }
-    ::ng-deep .campo-ano .mat-mdc-select-value { overflow: visible; text-overflow: unset; }
+    /* Hover / focus na borda */
+    ::ng-deep .campo-mes:hover .mdc-notched-outline__leading,
+    ::ng-deep .campo-mes:hover .mdc-notched-outline__notch,
+    ::ng-deep .campo-mes:hover .mdc-notched-outline__trailing,
+    ::ng-deep .campo-ano:hover .mdc-notched-outline__leading,
+    ::ng-deep .campo-ano:hover .mdc-notched-outline__notch,
+    ::ng-deep .campo-ano:hover .mdc-notched-outline__trailing {
+      border-color: var(--color-primary) !important;
+    }
+
+    /* Texto centralizado */
+    ::ng-deep .campo-mes .mat-mdc-select-value,
+    ::ng-deep .campo-ano .mat-mdc-select-value {
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-on-surface);
+      overflow: visible;
+      text-overflow: unset;
+    }
   `]
 })
 export class MesSelectorComponent implements OnInit {
@@ -105,8 +164,8 @@ export class MesSelectorComponent implements OnInit {
   navegar(delta: number) {
     let mes = this.mesSelecionado + delta;
     let ano = this.anoSelecionado;
-    if (mes < 1) { mes = 12; ano--; }
-    if (mes > 12) { mes = 1; ano++; }
+    if (mes < 1)  { mes = 12; ano--; }
+    if (mes > 12) { mes = 1;  ano++; }
     this.mesSelecionado = mes;
     this.anoSelecionado = ano;
     this.emitir();

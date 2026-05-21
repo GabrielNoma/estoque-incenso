@@ -25,82 +25,362 @@ import { ResumoMensalComponent } from '../resumo-mensal/resumo-mensal.component'
     ResumoMensalComponent
   ],
   template: `
-    <div class="barra-topo">
-      <app-mes-selector [valor]="mesAtual" (mudanca)="aoMudarMes($event)" />
-      <button mat-raised-button color="accent" (click)="exportarExcel()">
-        <mat-icon>download</mat-icon> Exportar Excel
-      </button>
-    </div>
+    <div class="grade-page">
+      <!-- Cabeçalho da página -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Produção</h1>
+          <p class="page-subtitle">Registro diário de produção por funcionária</p>
+        </div>
+      </div>
 
-    <div *ngIf="carregando() && !grade()" class="spinner-container">
-      <mat-spinner diameter="40" />
-    </div>
+      <!-- Barra de ações -->
+      <div class="barra-topo">
+        <app-mes-selector [valor]="mesAtual" (mudanca)="aoMudarMes($event)" />
+        <button mat-stroked-button color="primary" class="btn-exportar" (click)="exportarExcel()">
+          <mat-icon>download</mat-icon>
+          <span>Exportar Excel</span>
+        </button>
+      </div>
 
-    <div class="grade-wrapper" *ngIf="grade()" [class.atualizando]="carregando()">
-      <table class="grade">
-        <thead>
-          <tr>
-            <th class="col-nome">Funcionária</th>
-            <th *ngFor="let dia of dias()"
-                [class.fim-de-semana]="eFimDeSemana(dia)"
-                [class.dia-hoje]="eHoje(dia)"
-                class="col-dia">
-              <span class="dia-semana">{{ diaSemana(dia) }}</span><br><span class="num-dia">{{ dia }}</span>
-            </th>
-            <th class="col-total">Total (dz)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let func of grade()!.funcionarias">
-            <td class="col-nome">{{ func.nome }}</td>
-            <td *ngFor="let dia of dias()" [class.fim-de-semana]="eFimDeSemana(dia)" [class.dia-hoje]="eHoje(dia)">
-              <app-celula-producao
-                [funcionariaId]="func.id"
-                [data]="dataStr(dia)"
-                [registro]="buscarRegistro(func, dia)"
-                [fimDeSemana]="eFimDeSemana(dia)"
-                (salvar)="aoSalvar($event)"
-                (abrirDialogoFalta)="aoAbrirFalta($event)"
-                (excluir)="aoExcluir($event)"
-              />
-            </td>
-            <td class="col-total">{{ totalFuncionaria(func) }} dz</td>
-          </tr>
-        </tbody>
-        <tfoot>
-          <tr>
-            <td class="col-nome"><strong>TOTAL</strong></td>
-            <td *ngFor="let dia of dias()" [class.fim-de-semana]="eFimDeSemana(dia)" [class.dia-hoje]="eHoje(dia)" class="total-dia">
-              <strong>{{ totalDia(dia) > 0 ? totalDia(dia) + ' dz' : '' }}</strong>
-            </td>
-            <td class="col-total"><strong>{{ totalGeral() }} dz</strong></td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
+      <!-- Loading inicial -->
+      <div *ngIf="carregando() && !grade()" class="spinner-container">
+        <mat-spinner diameter="36" />
+        <span class="spinner-label">Carregando produção…</span>
+      </div>
 
-    <app-resumo-mensal *ngIf="grade()" [grade]="grade()" />
+      <!-- Grade de produção -->
+      <div class="grade-wrapper" *ngIf="grade()" [class.atualizando]="carregando()">
+        <table class="grade">
+          <thead>
+            <tr>
+              <th class="col-nome">Funcionária</th>
+              <th *ngFor="let dia of dias()"
+                  [class.fim-de-semana]="eFimDeSemana(dia)"
+                  [class.dia-hoje]="eHoje(dia)"
+                  class="col-dia">
+                <span class="dia-semana">{{ diaSemana(dia) }}</span>
+                <span class="num-dia">{{ dia }}</span>
+              </th>
+              <th class="col-total">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let func of grade()!.funcionarias">
+              <td class="col-nome">
+                <div class="nome-cell">
+                  <span class="avatar avatar-sm nome-avatar">{{ func.nome[0] }}</span>
+                  <span class="nome-texto">{{ func.nome }}</span>
+                </div>
+              </td>
+              <td *ngFor="let dia of dias()"
+                  [class.fim-de-semana]="eFimDeSemana(dia)"
+                  [class.dia-hoje]="eHoje(dia)">
+                <app-celula-producao
+                  [funcionariaId]="func.id"
+                  [data]="dataStr(dia)"
+                  [registro]="buscarRegistro(func, dia)"
+                  [fimDeSemana]="eFimDeSemana(dia)"
+                  (salvar)="aoSalvar($event)"
+                  (abrirDialogoFalta)="aoAbrirFalta($event)"
+                  (excluir)="aoExcluir($event)"
+                />
+              </td>
+              <td class="col-total">
+                <span class="total-valor">{{ totalFuncionaria(func) }}<span class="unidade"> dz</span></span>
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class="col-nome foot-label">Total diário</td>
+              <td *ngFor="let dia of dias()"
+                  [class.fim-de-semana]="eFimDeSemana(dia)"
+                  [class.dia-hoje]="eHoje(dia)"
+                  class="total-dia">
+                <span *ngIf="totalDia(dia) > 0" class="total-dia-valor">
+                  {{ totalDia(dia) }}<span class="unidade"> dz</span>
+                </span>
+              </td>
+              <td class="col-total grand-total">
+                <span class="total-valor">{{ totalGeral() }}<span class="unidade"> dz</span></span>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Resumo mensal -->
+      <app-resumo-mensal *ngIf="grade()" [grade]="grade()" />
+    </div>
   `,
   styles: [`
-    .barra-topo { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; }
-    .spinner-container { display: flex; justify-content: center; padding: 40px; }
-    .grade-wrapper { overflow-x: auto; transition: opacity 0.25s ease; }
-    .grade-wrapper.atualizando { opacity: 0.35; pointer-events: none; }
-    .grade { border-collapse: collapse; font-size: 13px; }
-    .grade th, .grade td { border: 1px solid #e0e0e0; padding: 4px 6px; white-space: nowrap; }
-    .grade thead th { background: #1976d2; color: white; font-weight: 600; text-align: center; }
-    .grade tfoot td { background: #e3f2fd; }
-    .col-nome { min-width: 140px; text-align: left; position: sticky; left: 0; z-index: 2; background: white; }
-    thead .col-nome { background: #1976d2; z-index: 3; }
-    tfoot .col-nome { background: #e3f2fd; }
-    .col-dia { min-width: 68px; text-align: center; }
-    .col-total { min-width: 70px; text-align: center; font-weight: 600; }
-    .fim-de-semana { background: #f5f5f5 !important; }
+    .grade-page {
+      max-width: 100%;
+    }
+
+    /* ── Cabeçalho ─────────────────────────────────────── */
+    .page-header {
+      margin-bottom: var(--space-5);
+    }
+    .page-title {
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-on-surface);
+      margin: 0;
+      line-height: 1.3;
+    }
+    .page-subtitle {
+      font-size: var(--font-size-sm);
+      color: var(--color-on-surface-muted);
+      margin: 3px 0 0;
+    }
+
+    /* ── Barra de ações ─────────────────────────────────── */
+    .barra-topo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--color-border);
+      margin-bottom: var(--space-5);
+      gap: var(--space-4);
+    }
+
+    .btn-exportar {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      white-space: nowrap;
+      flex-shrink: 0;
+
+      mat-icon { font-size: 18px; width: 18px; height: 18px; margin-right: 4px; }
+    }
+
+    /* ── Loading ────────────────────────────────────────── */
+    .spinner-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-3);
+      padding: var(--space-12);
+    }
+    .spinner-label {
+      font-size: var(--font-size-sm);
+      color: var(--color-on-surface-muted);
+    }
+
+    /* ── Wrapper da tabela ──────────────────────────────── */
+    .grade-wrapper {
+      overflow-x: auto;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--color-border);
+      box-shadow: var(--shadow-sm);
+      background: var(--color-surface);
+      transition: opacity var(--transition-base);
+      margin-bottom: var(--space-6);
+    }
+    .grade-wrapper.atualizando {
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    /* ── Tabela ─────────────────────────────────────────── */
+    .grade {
+      border-collapse: collapse;
+      font-size: var(--font-size-sm);
+      width: 100%;
+    }
+
+    .grade th,
+    .grade td {
+      border: 1px solid var(--color-border);
+      white-space: nowrap;
+    }
+
+    /* ── Header ─────────────────────────────────────────── */
+    .grade thead th {
+      background: var(--color-primary);
+      color: var(--color-primary-contrast);
+      font-weight: var(--font-weight-medium);
+      text-align: center;
+      padding: 8px 6px;
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      border-color: rgba(255,255,255,0.15);
+    }
+
+    .grade thead th.col-nome {
+      text-align: left;
+      background: var(--color-primary-dark);
+      position: sticky;
+      left: 0;
+      z-index: 5;
+    }
+
+    .grade thead th.fim-de-semana {
+      background: color-mix(in srgb, var(--color-primary) 80%, #000 20%);
+    }
+
+    .grade thead th.dia-hoje {
+      background: var(--color-today) !important;
+    }
+
+    /* ── Colunas fixas ──────────────────────────────────── */
+    .col-nome {
+      min-width: 162px;
+      text-align: left;
+      position: sticky;
+      left: 0;
+      z-index: 2;
+      background: var(--color-surface);
+      box-shadow: var(--shadow-sticky-col);
+    }
+
+    .col-dia {
+      min-width: 66px;
+      text-align: center;
+      padding: 3px 2px;
+    }
+
+    .col-total {
+      min-width: 82px;
+      text-align: center;
+      background: var(--color-surface-variant);
+      font-weight: var(--font-weight-semibold);
+      position: sticky;
+      right: 0;
+      z-index: 2;
+      box-shadow: -2px 0 4px rgba(0,0,0,0.06);
+    }
+
+    .grade thead .col-total {
+      background: color-mix(in srgb, var(--color-primary-dark) 90%, var(--color-surface-variant) 10%);
+      z-index: 5;
+    }
+
+    /* ── Corpo ──────────────────────────────────────────── */
+    .grade tbody tr {
+      transition: background-color var(--transition-fast);
+    }
+
+    .grade tbody tr:hover td {
+      background-color: var(--color-surface-variant) !important;
+    }
+
+    .grade tbody td {
+      padding: 2px 3px;
+      background: var(--color-surface);
+    }
+
+    .grade tbody .col-nome {
+      background: var(--color-surface);
+    }
+
+    .grade tbody tr:hover .col-nome,
+    .grade tbody tr:hover .col-total {
+      background-color: var(--color-surface-variant) !important;
+    }
+
+    /* ── Fim de semana ──────────────────────────────────── */
+    .grade tbody td.fim-de-semana,
+    .grade tfoot td.fim-de-semana {
+      background: var(--color-weekend) !important;
+    }
+
+    /* ── Dia de hoje ────────────────────────────────────── */
+    .grade tbody td.dia-hoje {
+      background: var(--color-today-bg) !important;
+      box-shadow: inset 0 0 0 1px var(--color-today-border);
+    }
+    .grade tfoot td.dia-hoje {
+      background: color-mix(in srgb, var(--color-today-bg) 60%, var(--color-surface-variant) 40%) !important;
+      box-shadow: inset 0 0 0 1px var(--color-today-border);
+    }
+
+    /* ── Rodapé ─────────────────────────────────────────── */
+    .grade tfoot td {
+      background: var(--color-surface-variant);
+      padding: 5px 4px;
+      border-top: 2px solid var(--color-border-strong);
+    }
+
+    .grade tfoot .col-nome {
+      background: var(--color-surface-variant);
+    }
+
+    .grand-total {
+      border-left: 2px solid var(--color-primary-lighter);
+    }
+
+    .foot-label {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-on-surface-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding-left: var(--space-3) !important;
+    }
+
+    /* ── Labels dos dias ────────────────────────────────── */
+    .dia-semana {
+      display: block;
+      font-size: 9px;
+      font-weight: var(--font-weight-bold);
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      opacity: 0.75;
+      line-height: 1;
+    }
+    .num-dia {
+      display: block;
+      font-size: 13px;
+      font-weight: var(--font-weight-medium);
+      line-height: 1.4;
+      margin-top: 1px;
+    }
+
+    /* ── Célula de nome ─────────────────────────────────── */
+    .nome-cell {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 4px var(--space-3);
+    }
+
+    /* Cores de avatar por posição da linha */
+    :host ::ng-deep .grade tbody tr:nth-child(6n+1) .nome-avatar { background: #1565C0; }
+    :host ::ng-deep .grade tbody tr:nth-child(6n+2) .nome-avatar { background: #7C3AED; }
+    :host ::ng-deep .grade tbody tr:nth-child(6n+3) .nome-avatar { background: #059669; }
+    :host ::ng-deep .grade tbody tr:nth-child(6n+4) .nome-avatar { background: #B45309; }
+    :host ::ng-deep .grade tbody tr:nth-child(6n+5) .nome-avatar { background: #DC2626; }
+    :host ::ng-deep .grade tbody tr:nth-child(6n+6) .nome-avatar { background: #0891B2; }
+
+    .nome-texto {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-on-surface);
+    }
+
+    /* ── Totais ─────────────────────────────────────────── */
+    .total-valor {
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-primary);
+    }
     .total-dia { text-align: center; }
-    .dia-hoje { box-shadow: inset 0 -4px 0 0 #ff9800; }
-    tbody .dia-hoje, tfoot .dia-hoje { background-color: rgba(255, 152, 0, 0.08) !important; }
-    .dia-semana { font-size: 12px; font-weight: 700; letter-spacing: 0.3px; }
-    .num-dia { font-size: 10px; font-weight: 400; opacity: 0.75; }
+    .total-dia-valor {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-on-surface-secondary);
+    }
+    .unidade {
+      font-weight: var(--font-weight-normal);
+      color: var(--color-on-surface-muted);
+      font-size: var(--font-size-xs);
+    }
   `]
 })
 export class GradeProducaoComponent implements OnInit {

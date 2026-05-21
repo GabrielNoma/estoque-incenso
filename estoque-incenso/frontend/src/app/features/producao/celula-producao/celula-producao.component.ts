@@ -28,8 +28,9 @@ export interface AbrirFaltaEvento {
   template: `
     <div class="celula" [class.falta]="registro?.falta" [class.fim-de-semana]="fimDeSemana">
       <ng-container *ngIf="registro?.falta; else inputNumero">
-        <span class="label-falta" [matTooltip]="registro?.motivoFalta ?? ''">F</span>
-        <button mat-icon-button class="btn-limpar" (click)="limparFalta()" matTooltip="Remover falta">
+        <span class="label-falta" [matTooltip]="registro?.motivoFalta ?? 'Falta'">F</span>
+        <button mat-icon-button class="btn-acao" (click)="limparFalta()"
+                matTooltip="Remover falta" aria-label="Remover falta">
           <mat-icon>close</mat-icon>
         </button>
       </ng-container>
@@ -44,25 +45,112 @@ export interface AbrirFaltaEvento {
           class="input-quantidade"
           placeholder="dz"
           [disabled]="fimDeSemana"
+          aria-label="Quantidade em dúzias"
         />
-        <button mat-icon-button class="btn-falta" (click)="abrirFalta()" matTooltip="Registrar falta" [disabled]="fimDeSemana">
+        <button mat-icon-button class="btn-acao btn-falta" (click)="abrirFalta()"
+                matTooltip="Registrar falta" aria-label="Registrar falta"
+                [disabled]="fimDeSemana">
           <mat-icon>sick</mat-icon>
         </button>
       </ng-template>
     </div>
   `,
   styles: [`
-    .celula { display: flex; align-items: center; gap: 2px; padding: 2px; }
-    .celula.falta { background: #fff9c4; }
-    .celula.fim-de-semana { background: #f5f5f5; }
-    .input-quantidade {
-      width: 52px; text-align: center; border: 1px solid #ccc;
-      border-radius: 4px; padding: 2px 4px; font-size: 13px;
+    .celula {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      padding: 2px 3px;
+      min-height: 34px;
+      border-radius: var(--radius-sm);
+      transition: background-color var(--transition-fast);
     }
-    .input-quantidade:focus { outline: none; border-color: #1976d2; }
-    .label-falta { font-weight: 700; color: #e65100; font-size: 13px; min-width: 20px; }
-    .btn-falta, .btn-limpar { width: 24px; height: 24px; line-height: 24px; }
-    .btn-falta mat-icon, .btn-limpar mat-icon { font-size: 16px; }
+
+    .celula.falta {
+      background: var(--color-absence);
+    }
+
+    .celula.fim-de-semana {
+      background: var(--color-weekend);
+    }
+
+    /* Input de quantidade */
+    .input-quantidade {
+      width: 50px;
+      text-align: center;
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 3px 4px;
+      font-size: var(--font-size-sm);
+      font-family: var(--font-family);
+      color: var(--color-on-surface);
+      background: transparent;
+      transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+
+      /* Remove spinners nativos */
+      -moz-appearance: textfield;
+      &::-webkit-inner-spin-button,
+      &::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+      &::placeholder { color: var(--color-on-surface-disabled); }
+
+      &:hover:not(:disabled) {
+        border-color: var(--color-border-strong);
+      }
+
+      &:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.15);
+      }
+
+      &:disabled {
+        opacity: 0.35;
+        cursor: not-allowed;
+      }
+    }
+
+    /* Badge de falta */
+    .label-falta {
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-bold);
+      color: var(--color-absence-text);
+      background: rgba(180, 83, 9, 0.14);
+      border-radius: var(--radius-sm);
+      padding: 2px 6px;
+      min-width: 24px;
+      text-align: center;
+      letter-spacing: 0.02em;
+      cursor: help;
+    }
+
+    /* Botões de ação */
+    .btn-acao {
+      width: 26px !important;
+      height: 26px !important;
+      padding: 3px !important;
+      color: var(--color-on-surface-disabled) !important;
+      transition: color var(--transition-fast), background-color var(--transition-fast);
+
+      mat-icon {
+        font-size: 15px !important;
+        width: 15px !important;
+        height: 15px !important;
+      }
+
+      &:hover:not(:disabled) {
+        color: var(--color-primary) !important;
+        background: var(--color-surface-variant) !important;
+      }
+
+      &:disabled { opacity: 0.3; }
+    }
+
+    .btn-falta:hover:not(:disabled) {
+      color: var(--color-warning) !important;
+    }
   `]
 })
 export class CelulaProducaoComponent implements OnChanges {
