@@ -123,12 +123,6 @@
   font-weight: var(--font-weight-medium);
 }
 
-:host ::ng-deep .mat-mdc-row:nth-child(6n+1) .resumo-avatar { background: #1565C0; }
-:host ::ng-deep .mat-mdc-row:nth-child(6n+2) .resumo-avatar { background: #7C3AED; }
-:host ::ng-deep .mat-mdc-row:nth-child(6n+3) .resumo-avatar { background: #059669; }
-:host ::ng-deep .mat-mdc-row:nth-child(6n+4) .resumo-avatar { background: #B45309; }
-:host ::ng-deep .mat-mdc-row:nth-child(6n+5) .resumo-avatar { background: #DC2626; }
-:host ::ng-deep .mat-mdc-row:nth-child(6n+6) .resumo-avatar { background: #0891B2; }
 
 .valor-producao {
   font-weight: var(--font-weight-semibold);

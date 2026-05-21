@@ -248,3 +248,12 @@ body {
 .mat-mdc-form-field.compact .mat-mdc-form-field-subscript-wrapper {
   display: none;
 }
+
+// Cores de avatar cicladas por linha (grade e resumo)
+$avatar-colors: #1565C0, #7C3AED, #059669, #B45309, #DC2626, #0891B2;
+@for $i from 1 through 6 {
+  .grade tbody tr:nth-child(6n+#{$i}) .nome-avatar,
+  .mat-mdc-row:nth-child(6n+#{$i}) .resumo-avatar {
+    background: nth($avatar-colors, $i);
+  }
+}
