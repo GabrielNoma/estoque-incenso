@@ -249,6 +249,29 @@ body {
   display: none;
 }
 
+// Tabela resumo mensal (Material CDK — requer escopo global)
+.tabela-resumo {
+  .mat-mdc-header-row { background: var(--color-surface-variant); }
+  .mat-mdc-header-cell {
+    font-size: var(--font-size-xs) !important;
+    font-weight: var(--font-weight-semibold) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-on-surface-muted) !important;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .mat-mdc-cell {
+    font-size: var(--font-size-base);
+    color: var(--color-on-surface);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .mat-mdc-row:hover .mat-mdc-cell { background: var(--color-surface-variant); }
+  .mat-mdc-footer-row { background: var(--color-surface-variant); border-top: 2px solid var(--color-border-strong); }
+  .mat-mdc-footer-cell { font-size: var(--font-size-sm); font-weight: var(--font-weight-bold); color: var(--color-on-surface); padding: 10px 16px; border-top: none; }
+}
+
 // Cores de avatar cicladas por linha (grade e resumo)
 $avatar-colors: #1565C0, #7C3AED, #059669, #B45309, #DC2626, #0891B2;
 @for $i from 1 through 6 {

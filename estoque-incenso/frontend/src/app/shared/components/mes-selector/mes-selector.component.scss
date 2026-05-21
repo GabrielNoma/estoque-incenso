@@ -63,14 +63,6 @@
   border-color: var(--color-border-strong) !important;
 }
 
-::ng-deep .campo-mes:hover .mdc-notched-outline__leading,
-::ng-deep .campo-mes:hover .mdc-notched-outline__notch,
-::ng-deep .campo-mes:hover .mdc-notched-outline__trailing,
-::ng-deep .campo-ano:hover .mdc-notched-outline__leading,
-::ng-deep .campo-ano:hover .mdc-notched-outline__notch,
-::ng-deep .campo-ano:hover .mdc-notched-outline__trailing {
-  border-color: var(--color-primary) !important;
-}
 
 ::ng-deep .campo-mes .mat-mdc-select-value,
 ::ng-deep .campo-ano .mat-mdc-select-value {
