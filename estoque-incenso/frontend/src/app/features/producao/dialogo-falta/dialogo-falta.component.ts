@@ -46,7 +46,7 @@ interface DadosDialogo {
       </button>
     </mat-dialog-actions>
   `,
-  styles: [`.grupo-motivo { display: flex; flex-direction: column; gap: 8px; }`]
+  styleUrl: './dialogo-falta.component.scss'
 })
 export class DialogoFaltaComponent {
   private readonly dialogRef = inject(MatDialogRef<DialogoFaltaComponent>);

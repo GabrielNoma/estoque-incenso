@@ -70,13 +70,7 @@ import { DialogoFuncionariaComponent } from './dialogo-funcionaria.component';
       <mat-row *matRowDef="let row; columns: colunas;"></mat-row>
     </mat-table>
   `,
-  styles: [`
-    .cabecalho { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .toggle-inativas { display: block; margin-bottom: 16px; }
-    .tabela { width: 100%; }
-    .badge-ativa { color: #2e7d32; font-weight: 500; }
-    .badge-inativa { color: #757575; }
-  `]
+  styleUrl: './funcionarias.component.scss'
 })
 export class FuncionariasComponent implements OnInit {
   private readonly service = inject(FuncionariasService);
