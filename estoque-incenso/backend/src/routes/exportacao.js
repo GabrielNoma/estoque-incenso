@@ -29,6 +29,16 @@ function fill(argb) {
   return { type: 'pattern', pattern: 'solid', fgColor: { argb } }
 }
 
+const BORDER_THIN = {
+  top:    { style: 'thin' },
+  left:   { style: 'thin' },
+  bottom: { style: 'thin' },
+  right:  { style: 'thin' },
+}
+
+const ALIGN_CENTER = { horizontal: 'center', vertical: 'middle', wrapText: false }
+const ALIGN_LEFT   = { horizontal: 'left',   vertical: 'middle', wrapText: false }
+
 async function exportacaoRoutes(fastify) {
   fastify.get('/exportacao/excel', async (request, reply) => {
     const ano = parseInt(request.query.ano, 10)
@@ -108,13 +118,22 @@ async function exportacaoRoutes(fastify) {
     header.push('Total')
     const hRow = wsProd.addRow(header)
     hRow.font = { bold: true, size: 9 }
-    hRow.height = 14
+    hRow.height = 16
+    // Célula "Funcionária" alinhada à esquerda; demais centradas
+    hRow.getCell(1).alignment = ALIGN_LEFT
+    hRow.getCell(1).border = BORDER_THIN
     for (let ci = 0; ci < colunas.length; ci++) {
       const col = colunas[ci]
       const cell = hRow.getCell(ci + 2)
+      cell.alignment = ALIGN_CENTER
+      cell.border = BORDER_THIN
       if (col.tipo === 'semana') cell.fill = fill(COR_SEMANA_ISO)
       else if (col.dow === 0 || col.dow === 6) cell.fill = fill(COR_FIM_SEMANA)
     }
+    // Célula "Total" no cabeçalho
+    const hTotalCell = hRow.getCell(colunas.length + 2)
+    hTotalCell.alignment = ALIGN_CENTER
+    hTotalCell.border = BORDER_THIN
 
     const totaisDia = new Array(colunas.length).fill(0)
 
@@ -146,12 +165,18 @@ async function exportacaoRoutes(fastify) {
       }
       rowData.push(totalFunc)
       const dataRow = wsProd.addRow(rowData)
-      dataRow.height = 14
+      dataRow.height = 16
       dataRow.font = { size: 9 }
+      // Célula do nome da funcionária
+      const nomeCell = dataRow.getCell(1)
+      nomeCell.alignment = ALIGN_LEFT
+      nomeCell.border = BORDER_THIN
       for (let ci = 0; ci < colunas.length; ci++) {
         const col = colunas[ci]
         const cell = dataRow.getCell(ci + 2)
         const reg = func.registros[col.dia]
+        cell.alignment = ALIGN_CENTER
+        cell.border = BORDER_THIN
         if (col.tipo === 'semana') {
           cell.fill = fill(COR_SEMANA_ISO)
           cell.font = { bold: true, size: 9 }
@@ -163,22 +188,42 @@ async function exportacaoRoutes(fastify) {
           if (col.dow === 0 || col.dow === 6) cell.fill = fill(COR_FIM_SEMANA)
         } else {
           cell.fill = fill(COR_VAZIO)
+          cell.font = { size: 9 }
         }
       }
+      // Célula "Total" da funcionária
+      const funcTotalCell = dataRow.getCell(colunas.length + 2)
+      funcTotalCell.alignment = ALIGN_CENTER
+      funcTotalCell.border = BORDER_THIN
     }
 
-    const totalRow = ['TOTAL DIA']
+    // Calcula o total geral mensal (soma de todos os dias de todos as funcionárias)
     let totalGeral = 0
     for (let ci = 0; ci < colunas.length; ci++) {
-      if (colunas[ci].tipo === 'semana') { totalRow.push(null); continue }
-      totalRow.push(totaisDia[ci] || null)
-      totalGeral += totaisDia[ci] || 0
+      if (colunas[ci].tipo === 'dia') totalGeral += totaisDia[ci] || 0
+    }
+    // Linha TOTAL MENSAL: apenas o total geral na última coluna; dias ficam null
+    const totalRow = ['TOTAL MENSAL']
+    for (let ci = 0; ci < colunas.length; ci++) {
+      totalRow.push(null)
     }
     totalRow.push(totalGeral)
     const tRow = wsProd.addRow(totalRow)
     tRow.font = { bold: true, size: 9 }
-    tRow.height = 14
-    tRow.eachCell(cell => { cell.fill = fill(COR_TOTAL) })
+    tRow.height = 16
+    tRow.getCell(1).alignment = ALIGN_LEFT
+    for (let ci = 0; ci < colunas.length; ci++) {
+      const cell = tRow.getCell(ci + 2)
+      cell.alignment = ALIGN_CENTER
+      cell.border = BORDER_THIN
+      cell.fill = fill(COR_TOTAL)
+    }
+    const tTotalCell = tRow.getCell(colunas.length + 2)
+    tTotalCell.alignment = ALIGN_CENTER
+    tTotalCell.border = BORDER_THIN
+    tTotalCell.fill = fill(COR_TOTAL)
+    tRow.getCell(1).border = BORDER_THIN
+    tRow.getCell(1).fill = fill(COR_TOTAL)
 
     // ── Aba Faltas ────────────────────────────────────────────────────────────
     const wsFaltas = workbook.addWorksheet('Faltas')

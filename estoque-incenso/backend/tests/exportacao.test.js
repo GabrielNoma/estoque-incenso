@@ -2,6 +2,7 @@
 
 const { test, before, after } = require('node:test')
 const assert = require('node:assert/strict')
+const ExcelJS = require('exceljs')
 const { buildTestApp } = require('./helpers')
 
 let app
@@ -62,4 +63,58 @@ test('GET /api/exportacao/excel — mes sem dados gera arquivo vazio válido [GR
   const res = await app.inject({ method: 'GET', url: '/api/exportacao/excel?ano=2000&mes=1' })
   assert.equal(res.statusCode, 200)
   assert.match(res.headers['content-disposition'], /producao_2000_01\.xlsx/)
+})
+
+test('GET /api/exportacao/excel — última linha da aba Produção tem rótulo TOTAL MENSAL [GREEN]', async () => {
+  const res = await app.inject({ method: 'GET', url: '/api/exportacao/excel?ano=2026&mes=5' })
+  assert.equal(res.statusCode, 200)
+  const workbook = new ExcelJS.Workbook()
+  await workbook.xlsx.load(res.rawPayload)
+  const ws = workbook.getWorksheet('Produção')
+  assert.ok(ws, 'aba Produção deve existir')
+  const lastRow = ws.getRow(ws.rowCount)
+  const primeiraCell = lastRow.getCell(1).value
+  assert.equal(primeiraCell, 'TOTAL MENSAL', 'última linha deve ter rótulo TOTAL MENSAL')
+})
+
+test('GET /api/exportacao/excel — não existe célula com texto TOTAL DIA [RED]', async () => {
+  const res = await app.inject({ method: 'GET', url: '/api/exportacao/excel?ano=2026&mes=5' })
+  assert.equal(res.statusCode, 200)
+  const workbook = new ExcelJS.Workbook()
+  await workbook.xlsx.load(res.rawPayload)
+  const ws = workbook.getWorksheet('Produção')
+  assert.ok(ws, 'aba Produção deve existir')
+  let encontrou = false
+  ws.eachRow(row => {
+    row.eachCell(cell => {
+      if (cell.value === 'TOTAL DIA') encontrou = true
+    })
+  })
+  assert.equal(encontrou, false, 'não deve existir célula com texto TOTAL DIA')
+})
+
+test('GET /api/exportacao/excel — total mensal é igual à soma das quantidades válidas [GREEN]', async () => {
+  const { rows } = await app.db.query(`
+    SELECT COALESCE(SUM(r.quantidade), 0)::int AS total
+    FROM registros_diarios r
+    JOIN funcionarias f ON f.id = r.funcionaria_id
+    WHERE EXTRACT(YEAR FROM r.data) = 2026
+      AND EXTRACT(MONTH FROM r.data) = 5
+      AND r.falta = false
+      AND r.quantidade IS NOT NULL
+  `)
+  const expectedTotal = rows[0].total
+
+  const res = await app.inject({ method: 'GET', url: '/api/exportacao/excel?ano=2026&mes=5' })
+  assert.equal(res.statusCode, 200)
+  const workbook = new ExcelJS.Workbook()
+  await workbook.xlsx.load(res.rawPayload)
+  const ws = workbook.getWorksheet('Produção')
+  assert.ok(ws, 'aba Produção deve existir')
+  const lastRow = ws.getRow(ws.rowCount)
+  let totalMensal = null
+  lastRow.eachCell({ includeEmpty: false }, cell => {
+    if (typeof cell.value === 'number') totalMensal = cell.value
+  })
+  assert.equal(totalMensal, expectedTotal, `total mensal no Excel deve bater com a soma do banco (${expectedTotal})`)
 })
