@@ -2,10 +2,12 @@
 
 const ExcelJS = require('exceljs')
 
-const COR_FALTA      = 'FFFFFF00'
-const COR_FIM_SEMANA = 'FFD3D3D3'
-const COR_SEMANA_ISO = 'FFBDD7EE'
-const COR_TOTAL      = 'FFC0C0C0'
+const COR_FALTA_FALTA    = 'FFFF0000'
+const COR_FALTA_ATESTADO = 'FFFF8C00'
+const COR_FIM_SEMANA     = 'FFD3D3D3'
+const COR_SEMANA_ISO     = 'FFBDD7EE'
+const COR_TOTAL          = 'FFC0C0C0'
+const COR_VAZIO          = 'FF000000'
 
 function diasNoMes(ano, mes) {
   return new Date(ano, mes, 0).getDate()
@@ -63,7 +65,7 @@ async function exportacaoRoutes(fastify) {
     const funcionarias = Array.from(map.values())
     const totalDias = diasNoMes(ano, mes)
 
-    // Colunas: dias + totais semanais ISO intercalados após o último dia de cada semana
+    // Colunas: dias + total semanal (coluna "T") intercalado após o último dia de cada semana
     const colunas = []
     const semanasVistas = new Set()
     for (let dia = 1; dia <= totalDias; dia++) {
@@ -83,13 +85,30 @@ async function exportacaoRoutes(fastify) {
     // ── Aba Produção ──────────────────────────────────────────────────────────
     const wsProd = workbook.addWorksheet('Produção')
 
+    wsProd.pageSetup.paperSize = 9
+    wsProd.pageSetup.orientation = 'landscape'
+    wsProd.pageSetup.fitToPage = true
+    wsProd.pageSetup.fitToWidth = 1
+    wsProd.pageSetup.fitToHeight = 0
+    wsProd.pageSetup.printTitlesRow = '1:1'
+    wsProd.pageSetup.printTitlesColumn = 'A:A'
+
+    wsProd.views = [{ state: 'frozen', xSplit: 1, ySplit: 1, topLeftCell: 'B2' }]
+
+    wsProd.getColumn(1).width = 18
+    for (let ci = 0; ci < colunas.length; ci++) {
+      wsProd.getColumn(ci + 2).width = colunas[ci].tipo === 'semana' ? 6 : 3
+    }
+    wsProd.getColumn(colunas.length + 2).width = 7
+
     const header = ['Funcionária']
     for (const col of colunas) {
-      header.push(col.tipo === 'dia' ? col.dia : `Sem ${col.sem}`)
+      header.push(col.tipo === 'dia' ? col.dia : 'T')
     }
     header.push('Total')
     const hRow = wsProd.addRow(header)
-    hRow.font = { bold: true }
+    hRow.font = { bold: true, size: 9 }
+    hRow.height = 14
     for (let ci = 0; ci < colunas.length; ci++) {
       const col = colunas[ci]
       const cell = hRow.getCell(ci + 2)
@@ -115,7 +134,7 @@ async function exportacaoRoutes(fastify) {
         } else {
           const reg = func.registros[col.dia]
           if (reg?.falta) {
-            rowData.push('FALTA')
+            rowData.push('F')
           } else if (reg?.quantidade != null) {
             rowData.push(reg.quantidade)
             totalFunc += reg.quantidade
@@ -127,12 +146,24 @@ async function exportacaoRoutes(fastify) {
       }
       rowData.push(totalFunc)
       const dataRow = wsProd.addRow(rowData)
+      dataRow.height = 14
+      dataRow.font = { size: 9 }
       for (let ci = 0; ci < colunas.length; ci++) {
         const col = colunas[ci]
         const cell = dataRow.getCell(ci + 2)
-        if (col.tipo === 'semana') { cell.fill = fill(COR_SEMANA_ISO); cell.font = { bold: true } }
-        else if (col.dow === 0 || col.dow === 6) cell.fill = fill(COR_FIM_SEMANA)
-        else if (func.registros[col.dia]?.falta) cell.fill = fill(COR_FALTA)
+        const reg = func.registros[col.dia]
+        if (col.tipo === 'semana') {
+          cell.fill = fill(COR_SEMANA_ISO)
+          cell.font = { bold: true, size: 9 }
+        } else if (reg?.falta) {
+          const cor = reg.motivo_falta === 'atestado' ? COR_FALTA_ATESTADO : COR_FALTA_FALTA
+          cell.fill = fill(cor)
+          cell.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 9 }
+        } else if (reg?.quantidade != null) {
+          if (col.dow === 0 || col.dow === 6) cell.fill = fill(COR_FIM_SEMANA)
+        } else {
+          cell.fill = fill(COR_VAZIO)
+        }
       }
     }
 
@@ -145,7 +176,8 @@ async function exportacaoRoutes(fastify) {
     }
     totalRow.push(totalGeral)
     const tRow = wsProd.addRow(totalRow)
-    tRow.font = { bold: true }
+    tRow.font = { bold: true, size: 9 }
+    tRow.height = 14
     tRow.eachCell(cell => { cell.fill = fill(COR_TOTAL) })
 
     // ── Aba Faltas ────────────────────────────────────────────────────────────

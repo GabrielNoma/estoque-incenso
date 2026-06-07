@@ -48,17 +48,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
       </div>
     </div>
 
-    <!-- Navegação mobile (bottom nav) -->
-    <nav class="bottom-nav">
-      <a routerLink="/producao" routerLinkActive="active" class="bottom-nav-item">
-        <mat-icon>grid_view</mat-icon>
-        <span>Produção</span>
-      </a>
-      <a routerLink="/funcionarias" routerLinkActive="active" class="bottom-nav-item">
-        <mat-icon>group</mat-icon>
-        <span>Funcionárias</span>
-      </a>
-    </nav>
   `,
   styleUrl: './app.component.scss'
 })

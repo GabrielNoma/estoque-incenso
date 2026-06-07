@@ -10,3 +10,6 @@ frontend/.angular/
 # IDE
 .vs/
 *.user
+
+# Claude Code (local only)
+.claude/
