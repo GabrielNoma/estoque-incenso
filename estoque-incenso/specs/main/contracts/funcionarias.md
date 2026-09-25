@@ -17,8 +17,8 @@ Lista funcionárias. Por padrão retorna apenas ativas.
 **Response 200:**
 ```json
 [
-  { "id": 1, "nome": "Ana Silva", "ativa": true },
-  { "id": 2, "nome": "Bia Santos", "ativa": false }
+  { "id": 1, "nome": "Ana Silva", "ativa": true, "inativadaEm": null },
+  { "id": 2, "nome": "Bia Santos", "ativa": false, "inativadaEm": "2026-08-31" }
 ]
 ```
 
@@ -35,7 +35,7 @@ Cria uma nova funcionária.
 
 **Response 201:**
 ```json
-{ "id": 3, "nome": "Carla Lima", "ativa": true }
+{ "id": 3, "nome": "Carla Lima", "ativa": true, "inativadaEm": null }
 ```
 
 **Response 409** — nome já existe:
@@ -56,7 +56,7 @@ Atualiza o nome de uma funcionária.
 
 **Response 200:**
 ```json
-{ "id": 3, "nome": "Carla Lima Atualizada", "ativa": true }
+{ "id": 3, "nome": "Carla Lima Atualizada", "ativa": true, "inativadaEm": null }
 ```
 
 **Response 404** — não encontrada.
@@ -65,7 +65,8 @@ Atualiza o nome de uma funcionária.
 
 ## PATCH /api/funcionarias/{id}/status
 
-Ativa ou desativa uma funcionária.
+Ativa ou desativa uma funcionária. Ao desativar, grava `inativadaEm` com a data do dia
+(America/Sao_Paulo); ao reativar, `inativadaEm` volta a `null`.
 
 **Body:**
 ```json
@@ -74,7 +75,7 @@ Ativa ou desativa uma funcionária.
 
 **Response 200:**
 ```json
-{ "id": 3, "nome": "Carla Lima", "ativa": false }
+{ "id": 3, "nome": "Carla Lima", "ativa": false, "inativadaEm": "2026-09-25" }
 ```
 
 **Response 404** — não encontrada.

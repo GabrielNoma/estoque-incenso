@@ -6,8 +6,10 @@ Base URL: `/api/registros`
 
 ## GET /api/registros
 
-Retorna todos os registros do mês/ano selecionado. Inclui funcionárias ativas
-(e inativas que possuam registros naquele mês — para permitir consulta histórica).
+Retorna todos os registros do mês/ano selecionado. Inclui funcionárias ativas,
+inativas cuja `inativada_em` seja no mês consultado ou depois, e inativas que possuam
+registros naquele mês — a produção passada continua visível; meses após a inativação não a exibem.
+A exportação Excel (`GET /api/exportacao/excel`) segue a mesma regra.
 
 **Query params (obrigatórios):**
 

@@ -28,6 +28,7 @@ npm test; npm run lint
 C# (.NET 8), TypeScript (Angular 17): Follow standard conventions
 
 ## Recent Changes
+- fix inativação por data: coluna `funcionarias.inativada_em` (DATE); funcionária inativada aparece na grade/Excel até o mês da inativação e some nos meses seguintes. Coluna criada no startup via `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` (plugins/db.js)
 - 002-migrate-node-fastify: Added Node.js 20 LTS + JavaScript (CommonJS) + Fastify 5, pg (node-postgres 8.x), ExcelJS 4.x, @fastify/cors, @fastify/static, dotenv
 - 001-compact-calendar-today: Added TypeScript 5.x (Angular 17, standalone components) + Angular Material MDC (`MatSelectModule`, `MatFormFieldModule`, `MatButtonModule`, `MatIconModule`), `CommonModule`, `FormsModule`
 - 001-compact-calendar-today: Added TypeScript (Angular 17) + SCSS inline + Angular Material (`MatSelectModule`, `MatFormFieldModule`, `MatButtonModule`, `MatIconModule`)

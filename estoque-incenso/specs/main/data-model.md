@@ -11,11 +11,15 @@ Representa uma funcionária da empresa. Pode ser desativada sem perda de histór
 | Id     | int (PK)     | identity, not null           |                                        |
 | Nome   | varchar(100) | not null, unique             | Nome exibido na grade                  |
 | Ativa  | bool         | not null, default true       | False = não aparece na grade diária    |
+| InativadaEm | date      | null                         | Data da inativação (fuso America/Sao_Paulo); null quando ativa |
 
 **Regras de negócio:**
 - `Nome` DEVE ser único (evitar duplicatas de funcionárias com mesmo nome)
 - Desativar uma funcionária NÃO apaga seus registros históricos
-- Funcionária desativada NÃO aparece na grade do mês atual, mas pode ser consultada em meses passados
+- Ao desativar, `InativadaEm` recebe a data do dia; ao reativar, volta a null
+- Funcionária desativada aparece na grade/exportação de um mês se: foi inativada naquele mês ou depois
+  (`inativada_em >= 1º dia do mês`) OU possui registros naquele mês. Nos meses seguintes à inativação ela não aparece
+- Inativas antigas com `InativadaEm` null só aparecem nos meses em que possuem registros
 
 ---
 
@@ -88,6 +92,7 @@ CREATE TABLE funcionarias (
     id      SERIAL PRIMARY KEY,
     nome    VARCHAR(100) NOT NULL,
     ativa   BOOLEAN NOT NULL DEFAULT TRUE,
+    inativada_em DATE,
     CONSTRAINT uq_funcionaria_nome UNIQUE (nome)
 );
 
