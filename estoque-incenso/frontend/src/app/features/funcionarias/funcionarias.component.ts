@@ -48,7 +48,7 @@ import { DialogoFuncionariaComponent } from './dialogo-funcionaria.component';
         <mat-header-cell *matHeaderCellDef>Status</mat-header-cell>
         <mat-cell *matCellDef="let f">
           <span [class]="f.ativa ? 'badge-ativa' : 'badge-inativa'">
-            {{ f.ativa ? 'Ativa' : 'Inativa' }}
+            {{ f.ativa ? 'Ativa' : 'Inativa' }}<ng-container *ngIf="!f.ativa && f.inativadaEm"> desde {{ f.inativadaEm.split('-').reverse().join('/') }}</ng-container>
           </span>
         </mat-cell>
       </ng-container>

@@ -139,3 +139,23 @@ test('DELETE /api/registros/:id — id inexistente retorna 404 [RED]', async () 
   const res = await app.inject({ method: 'DELETE', url: '/api/registros/999999' })
   assert.equal(res.statusCode, 404)
 })
+
+// ── Inativação por data ──────────────────────────────────────────────────────
+
+test('GET /api/registros — inativa aparece até o mês da inativação e some depois [GREEN]', async () => {
+  await app.db.query("DELETE FROM funcionarias WHERE nome = 'TESTR_inativada'")
+  const r = await app.db.query(
+    "INSERT INTO funcionarias (nome, ativa, inativada_em) VALUES ('TESTR_inativada', false, '2026-05-15') RETURNING id"
+  )
+  const id = r.rows[0].id
+  try {
+    const maio = JSON.parse((await app.inject({ method: 'GET', url: '/api/registros?ano=2026&mes=5' })).body)
+    assert.ok(maio.funcionarias.some(f => f.id === id))
+    const abril = JSON.parse((await app.inject({ method: 'GET', url: '/api/registros?ano=2026&mes=4' })).body)
+    assert.ok(abril.funcionarias.some(f => f.id === id))
+    const junho = JSON.parse((await app.inject({ method: 'GET', url: '/api/registros?ano=2026&mes=6' })).body)
+    assert.ok(!junho.funcionarias.some(f => f.id === id))
+  } finally {
+    await app.db.query('DELETE FROM funcionarias WHERE id = $1', [id])
+  }
+})

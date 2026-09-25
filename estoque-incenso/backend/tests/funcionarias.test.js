@@ -119,6 +119,7 @@ test('PATCH /api/funcionarias/:id/status — desativa [GREEN]', async () => {
   })
   assert.equal(res.statusCode, 200)
   assert.equal(JSON.parse(res.body).ativa, false)
+  assert.match(JSON.parse(res.body).inativadaEm, /^\d{4}-\d{2}-\d{2}$/)
 })
 
 test('PATCH /api/funcionarias/:id/status — ativa novamente [GREEN]', async () => {
@@ -128,6 +129,7 @@ test('PATCH /api/funcionarias/:id/status — ativa novamente [GREEN]', async () 
   })
   assert.equal(res.statusCode, 200)
   assert.equal(JSON.parse(res.body).ativa, true)
+  assert.equal(JSON.parse(res.body).inativadaEm, null)
 })
 
 test('PATCH /api/funcionarias/:id/status — id inexistente retorna 404 [RED]', async () => {

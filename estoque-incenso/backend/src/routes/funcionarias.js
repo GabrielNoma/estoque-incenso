@@ -1,12 +1,14 @@
 'use strict'
 
+const COLUNAS = `id, nome, ativa, TO_CHAR(inativada_em, 'YYYY-MM-DD') AS "inativadaEm"`
+
 async function funcionariasRoutes(fastify) {
   // GET /api/funcionarias
   fastify.get('/funcionarias', async (request, reply) => {
     const includeInactive = request.query.incluirInativas === 'true'
     const sql = includeInactive
-      ? 'SELECT id, nome, ativa FROM funcionarias ORDER BY nome'
-      : 'SELECT id, nome, ativa FROM funcionarias WHERE ativa = true ORDER BY nome'
+      ? `SELECT ${COLUNAS} FROM funcionarias ORDER BY nome`
+      : `SELECT ${COLUNAS} FROM funcionarias WHERE ativa = true ORDER BY nome`
     const result = await fastify.db.query(sql)
     return result.rows
   })
@@ -19,7 +21,7 @@ async function funcionariasRoutes(fastify) {
     }
     try {
       const result = await fastify.db.query(
-        'INSERT INTO funcionarias (nome) VALUES ($1) RETURNING id, nome, ativa',
+        `INSERT INTO funcionarias (nome) VALUES ($1) RETURNING ${COLUNAS}`,
         [nome.trim()]
       )
       return reply.code(201).send(result.rows[0])
@@ -39,7 +41,7 @@ async function funcionariasRoutes(fastify) {
       return reply.code(400).send({ error: 'Nome é obrigatório.' })
     }
     const result = await fastify.db.query(
-      'UPDATE funcionarias SET nome=$1 WHERE id=$2 RETURNING id, nome, ativa',
+      `UPDATE funcionarias SET nome=$1 WHERE id=$2 RETURNING ${COLUNAS}`,
       [nome.trim(), id]
     )
     if (result.rowCount === 0) {
@@ -56,7 +58,13 @@ async function funcionariasRoutes(fastify) {
       return reply.code(400).send({ error: 'Campo "ativa" deve ser boolean.' })
     }
     const result = await fastify.db.query(
-      'UPDATE funcionarias SET ativa=$1 WHERE id=$2 RETURNING id, nome, ativa',
+      // Guarda a data de inativação: meses até ela continuam mostrando a funcionária,
+      // meses posteriores não. Reativar limpa a data.
+      `UPDATE funcionarias
+       SET ativa=$1,
+           inativada_em = CASE WHEN $1 THEN NULL
+                               ELSE COALESCE(inativada_em, (now() AT TIME ZONE 'America/Sao_Paulo')::date) END
+       WHERE id=$2 RETURNING ${COLUNAS}`,
       [ativa, id]
     )
     if (result.rowCount === 0) {

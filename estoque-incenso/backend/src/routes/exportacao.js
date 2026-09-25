@@ -59,7 +59,10 @@ async function exportacaoRoutes(fastify) {
         ON r.funcionaria_id = f.id
         AND EXTRACT(YEAR FROM r.data) = $1
         AND EXTRACT(MONTH FROM r.data) = $2
-      WHERE f.ativa = true OR r.id IS NOT NULL
+      -- Aparece no mês se: ativa, ou inativada durante/após o mês, ou tem registro no mês
+      WHERE f.ativa = true
+         OR f.inativada_em >= make_date($1::int, $2::int, 1)
+         OR r.id IS NOT NULL
       ORDER BY f.nome, r.data
     `, [ano, mes])
 

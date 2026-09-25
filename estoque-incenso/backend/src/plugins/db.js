@@ -18,6 +18,7 @@ async function dbPlugin(fastify) {
   try {
     await pool.query('SELECT 1')
     fastify.log.info('Conexão com o banco de dados estabelecida')
+    await pool.query('ALTER TABLE funcionarias ADD COLUMN IF NOT EXISTS inativada_em DATE')
   } catch (err) {
     fastify.log.error({ err, DATABASE_URL: process.env.DATABASE_URL?.replace(/:\/\/.*@/, '://***@') }, 'Falha ao conectar com o banco de dados')
     throw err
