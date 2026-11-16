@@ -2,7 +2,6 @@ CREATE TABLE IF NOT EXISTS funcionarias (
   id    SERIAL PRIMARY KEY,
   nome  VARCHAR(100) NOT NULL,
   ativa BOOLEAN      NOT NULL DEFAULT true,
-  inativada_em DATE,
   CONSTRAINT uq_funcionaria_nome UNIQUE (nome)
 );
 
@@ -21,5 +20,3 @@ CREATE TABLE IF NOT EXISTS registros_diarios (
   CONSTRAINT chk_obs_quando_outro          CHECK ((motivo_falta <> 'outro') OR ((motivo_falta = 'outro') AND (observacao_falta IS NOT NULL) AND (observacao_falta <> '')))
 );
 
--- Migração: data de inativação (produção passada continua visível, meses futuros não)
-ALTER TABLE funcionarias ADD COLUMN IF NOT EXISTS inativada_em DATE;
