@@ -118,7 +118,7 @@ export class ResumoMensalComponent implements OnChanges {
   @Input() grade: GradeMensal | null = null;
 
   resumos: ResumoFuncionaria[] = [];
-  // Só quem produziu aparece na tabela; os totais continuam somando todos os resumos.
+  // Só quem produziu aparece na tabela; os totais somam exatamente as linhas exibidas.
   resumosExibidos: ResumoFuncionaria[] = [];
   colunas = ['nome', 'totalProduzido', 'atestados', 'faltas', 'outros'];
 
@@ -129,10 +129,10 @@ export class ResumoMensalComponent implements OnChanges {
     return this.grade ? this.mesesNomes[this.grade.mes - 1] : '';
   }
 
-  get totalGeral():     number { return this.resumos.reduce((s, r) => s + r.totalProduzido, 0); }
-  get totalAtestados(): number { return this.resumos.reduce((s, r) => s + r.atestados,     0); }
-  get totalFaltas():    number { return this.resumos.reduce((s, r) => s + r.faltas,        0); }
-  get totalOutros():    number { return this.resumos.reduce((s, r) => s + r.outros,        0); }
+  get totalGeral():     number { return this.resumosExibidos.reduce((s, r) => s + r.totalProduzido, 0); }
+  get totalAtestados(): number { return this.resumosExibidos.reduce((s, r) => s + r.atestados,     0); }
+  get totalFaltas():    number { return this.resumosExibidos.reduce((s, r) => s + r.faltas,        0); }
+  get totalOutros():    number { return this.resumosExibidos.reduce((s, r) => s + r.outros,        0); }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['grade'] && this.grade) {
