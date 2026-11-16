@@ -30,9 +30,8 @@ async function registrosRoutes(fastify) {
         ON r.funcionaria_id = f.id
         AND EXTRACT(YEAR FROM r.data) = $1
         AND EXTRACT(MONTH FROM r.data) = $2
-      -- Aparece no mês se: ativa, ou inativada durante/após o mês, ou tem registro no mês
+      -- Entra na contagem/relatório do mês se: ativa, ou inativa mas com registro no mês
       WHERE f.ativa = true
-         OR f.inativada_em >= make_date($1::int, $2::int, 1)
          OR r.id IS NOT NULL
       ORDER BY f.nome, r.data
     `, [ano, mes])

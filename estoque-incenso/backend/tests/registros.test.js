@@ -142,20 +142,24 @@ test('DELETE /api/registros/:id — id inexistente retorna 404 [RED]', async () 
 
 // ── Inativação por data ──────────────────────────────────────────────────────
 
-test('GET /api/registros — inativa aparece até o mês da inativação e some depois [GREEN]', async () => {
+test('GET /api/registros — inativa só entra no mês em que tem registro [GREEN]', async () => {
   await app.db.query("DELETE FROM funcionarias WHERE nome = 'TESTR_inativada'")
   const r = await app.db.query(
     "INSERT INTO funcionarias (nome, ativa, inativada_em) VALUES ('TESTR_inativada', false, '2026-05-15') RETURNING id"
   )
   const id = r.rows[0].id
   try {
+    await app.db.query(
+      "INSERT INTO registros_diarios (funcionaria_id, data, quantidade) VALUES ($1, '2026-05-10', 5)", [id]
+    )
     const maio = JSON.parse((await app.inject({ method: 'GET', url: '/api/registros?ano=2026&mes=5' })).body)
-    assert.ok(maio.funcionarias.some(f => f.id === id))
-    const abril = JSON.parse((await app.inject({ method: 'GET', url: '/api/registros?ano=2026&mes=4' })).body)
-    assert.ok(abril.funcionarias.some(f => f.id === id))
+    const naoMaio = maio.funcionarias.find(f => f.id === id)
+    assert.ok(naoMaio, 'inativa com produção no mês deve entrar na contagem')
+    assert.equal(naoMaio.ativa, false)
     const junho = JSON.parse((await app.inject({ method: 'GET', url: '/api/registros?ano=2026&mes=6' })).body)
-    assert.ok(!junho.funcionarias.some(f => f.id === id))
+    assert.ok(!junho.funcionarias.some(f => f.id === id), 'inativa sem registro no mês não aparece')
   } finally {
+    await app.db.query('DELETE FROM registros_diarios WHERE funcionaria_id = $1', [id])
     await app.db.query('DELETE FROM funcionarias WHERE id = $1', [id])
   }
 })
