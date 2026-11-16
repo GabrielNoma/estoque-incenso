@@ -119,6 +119,9 @@ test('PATCH /api/funcionarias/:id/status — desativa [GREEN]', async () => {
   })
   assert.equal(res.statusCode, 200)
   assert.equal(JSON.parse(res.body).ativa, false)
+  const { rows } = await app.db.query('SELECT inativada_em FROM funcionarias WHERE id = $1', [idCriado])
+  assert.ok(rows[0].inativada_em, 'inativada_em deve ser gravada ao inativar')
+  assert.equal(JSON.parse(res.body).inativadaEm, undefined, 'inativada_em não é devolvida pela API')
 })
 
 test('PATCH /api/funcionarias/:id/status — ativa novamente [GREEN]', async () => {
@@ -128,6 +131,8 @@ test('PATCH /api/funcionarias/:id/status — ativa novamente [GREEN]', async () 
   })
   assert.equal(res.statusCode, 200)
   assert.equal(JSON.parse(res.body).ativa, true)
+  const { rows } = await app.db.query('SELECT inativada_em FROM funcionarias WHERE id = $1', [idCriado])
+  assert.equal(rows[0].inativada_em, null, 'inativada_em deve ser limpa ao reativar')
 })
 
 test('PATCH /api/funcionarias/:id/status — id inexistente retorna 404 [RED]', async () => {

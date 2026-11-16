@@ -58,8 +58,13 @@ async function funcionariasRoutes(fastify) {
       return reply.code(400).send({ error: 'Campo "ativa" deve ser boolean.' })
     }
     const result = await fastify.db.query(
-      // Inativar é a "exclusão lógica": a linha fica, pois registros_diarios a referencia (histórico).
-      `UPDATE funcionarias SET ativa=$1 WHERE id=$2 RETURNING ${COLUNAS}`,
+      // Inativar é a "exclusão lógica": a linha fica, pois registros_diarios a referencia.
+      // inativada_em é só histórico (quando saiu): gravada aqui, mas não lida nem devolvida pela API.
+      `UPDATE funcionarias
+       SET ativa=$1,
+           inativada_em = CASE WHEN $1 THEN NULL
+                               ELSE COALESCE(inativada_em, (now() AT TIME ZONE 'America/Sao_Paulo')::date) END
+       WHERE id=$2 RETURNING ${COLUNAS}`,
       [ativa, id]
     )
     if (result.rowCount === 0) {

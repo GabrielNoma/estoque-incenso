@@ -11,6 +11,7 @@ Representa uma funcionária da empresa. Pode ser desativada sem perda de histór
 | Id     | int (PK)     | identity, not null           |                                        |
 | Nome   | varchar(100) | not null, unique             | Nome exibido na grade                  |
 | Ativa  | bool         | not null, default true       | False = não aparece na grade diária (exclusão lógica) |
+| InativadaEm | date      | null                         | Histórico: data da inativação (America/Sao_Paulo), null quando ativa. Gravada, mas não lida pelo sistema |
 
 **Regras de negócio:**
 - `Nome` DEVE ser único (evitar duplicatas de funcionárias com mesmo nome)
@@ -90,6 +91,7 @@ CREATE TABLE funcionarias (
     id      SERIAL PRIMARY KEY,
     nome    VARCHAR(100) NOT NULL,
     ativa   BOOLEAN NOT NULL DEFAULT TRUE,
+    inativada_em DATE,
     CONSTRAINT uq_funcionaria_nome UNIQUE (nome)
 );
 

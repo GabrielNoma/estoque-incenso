@@ -66,6 +66,8 @@ Atualiza o nome de uma funcionária.
 ## PATCH /api/funcionarias/{id}/status
 
 Ativa ou desativa uma funcionária (exclusão lógica; o histórico de registros é mantido).
+Ao desativar, grava `inativada_em` com a data do dia (America/Sao_Paulo); ao reativar, volta a `null`.
+A coluna é só histórico: não é devolvida pela API nem usada em nenhuma regra.
 
 **Body:**
 ```json
