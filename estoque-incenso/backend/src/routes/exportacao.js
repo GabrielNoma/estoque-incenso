@@ -1,6 +1,7 @@
 'use strict'
 
 const ExcelJS = require('exceljs')
+const { buscarProducaoDoMes } = require('../queries/producaoMensal')
 
 const COR_FALTA_FALTA    = 'FFFF0000'
 const COR_FALTA_ATESTADO = 'FFFF8C00'
@@ -47,35 +48,10 @@ async function exportacaoRoutes(fastify) {
       return reply.code(400).send({ error: 'Ano e mês são obrigatórios e devem ser válidos.' })
     }
 
-    const result = await fastify.db.query(`
-      SELECT
-        f.id AS funcionaria_id, f.nome,
-        r.id,
-        EXTRACT(DAY FROM r.data)::int AS dia,
-        r.quantidade, r.falta, r.motivo_falta, r.observacao_falta,
-        TO_CHAR(r.data, 'YYYY-MM-DD') AS data_iso
-      FROM funcionarias f
-      LEFT JOIN registros_diarios r
-        ON r.funcionaria_id = f.id
-        AND EXTRACT(YEAR FROM r.data) = $1
-        AND EXTRACT(MONTH FROM r.data) = $2
-      -- Aparece no mês se: ativa, ou inativada durante/após o mês, ou tem registro no mês
-      WHERE f.ativa = true
-         OR f.inativada_em >= make_date($1::int, $2::int, 1)
-         OR r.id IS NOT NULL
-      ORDER BY f.nome, r.data
-    `, [ano, mes])
-
-    const map = new Map()
-    for (const row of result.rows) {
-      if (!map.has(row.funcionaria_id)) {
-        map.set(row.funcionaria_id, { id: row.funcionaria_id, nome: row.nome, registros: {} })
-      }
-      if (row.id != null) {
-        map.get(row.funcionaria_id).registros[row.dia] = row
-      }
-    }
-    const funcionarias = Array.from(map.values())
+    const funcionarias = (await buscarProducaoDoMes(fastify.db, ano, mes)).map(f => ({
+      ...f,
+      registros: Object.fromEntries(f.registros.map(r => [r.dia, r])),
+    }))
     const totalDias = diasNoMes(ano, mes)
 
     // Colunas: dias + total semanal (coluna "T") intercalado após o último dia de cada semana

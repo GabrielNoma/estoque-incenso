@@ -6,15 +6,12 @@ Base URL: `/api/registros`
 
 ## GET /api/registros
 
-Retorna todos os registros do mês/ano selecionado. Inclui funcionárias ativas,
-inativas cuja `inativada_em` seja no mês consultado ou depois, e inativas que possuam
-registros naquele mês — a produção passada continua visível; meses após a inativação não a exibem.
-A exportação Excel (`GET /api/exportacao/excel`) segue a mesma regra.
+Retorna os registros do mês/ano selecionado. Inclui funcionárias ativas e inativas que possuam registros
+no mês (campo `ativa` indica a situação). O frontend não exibe inativas na grade, mas as soma nos totais e no
+Resumo Mensal. A exportação Excel (`GET /api/exportacao/excel`) segue a mesma regra, implementada em
+`backend/src/queries/producaoMensal.js`. `mes` fora de 1–12 retorna 400.
 
-**Query params (obrigatórios):**
-
-| Param | Tipo | Descrição            |
-|-------|------|----------------------|
+-------|------|----------------------|
 | ano   | int  | Ano (ex: 2026)       |
 | mes   | int  | Mês 1–12 (ex: 4)     |
 

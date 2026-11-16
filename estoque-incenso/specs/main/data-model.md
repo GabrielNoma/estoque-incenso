@@ -10,16 +10,15 @@ Representa uma funcionária da empresa. Pode ser desativada sem perda de histór
 |--------|--------------|------------------------------|----------------------------------------|
 | Id     | int (PK)     | identity, not null           |                                        |
 | Nome   | varchar(100) | not null, unique             | Nome exibido na grade                  |
-| Ativa  | bool         | not null, default true       | False = não aparece na grade diária    |
-| InativadaEm | date      | null                         | Data da inativação (fuso America/Sao_Paulo); null quando ativa |
+| Ativa  | bool         | not null, default true       | False = não aparece na grade diária (exclusão lógica) |
+| InativadaEm | date      | null                         | Histórico: data da inativação (America/Sao_Paulo), null quando ativa. Gravada, mas não lida pelo sistema |
 
 **Regras de negócio:**
 - `Nome` DEVE ser único (evitar duplicatas de funcionárias com mesmo nome)
 - Desativar uma funcionária NÃO apaga seus registros históricos
-- Ao desativar, `InativadaEm` recebe a data do dia; ao reativar, volta a null
-- Funcionária desativada aparece na grade/exportação de um mês se: foi inativada naquele mês ou depois
-  (`inativada_em >= 1º dia do mês`) OU possui registros naquele mês. Nos meses seguintes à inativação ela não aparece
-- Inativas antigas com `InativadaEm` null só aparecem nos meses em que possuem registros
+- Funcionária inativa NUNCA aparece na grade diária (calendário), mas entra nos totais, no Resumo Mensal e na
+  exportação dos meses em que possui registros. Sem registros no mês, não aparece em lugar nenhum
+- A linha da funcionária não é removida (`registros_diarios` a referencia, ON DELETE RESTRICT); `Ativa` é a exclusão lógica
 
 ---
 

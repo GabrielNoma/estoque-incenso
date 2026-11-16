@@ -9,8 +9,6 @@ Auto-generated from all feature plans. Last updated: 2026-05-13
 - Node.js 20 LTS + JavaScript (CommonJS) + Fastify 5, pg (node-postgres 8.x), ExcelJS 4.x, @fastify/cors, @fastify/static, dotenv (002-migrate-node-fastify)
 - PostgreSQL 16 via `pg` pool com queries SQL raw; Supabase free tier em produção (002-migrate-node-fastify)
 
-- C# (.NET 8), TypeScript (Angular 17) + Angular 17, Angular Material, .NET 8 Web API, Entity Framework Core 8, EPPlus 7, PostgreSQL 16, Npgsql (main)
-
 ## Project Structure
 
 ```text
@@ -25,10 +23,12 @@ npm test; npm run lint
 
 ## Code Style
 
-C# (.NET 8), TypeScript (Angular 17): Follow standard conventions
+JavaScript (Node.js 20, CommonJS) no backend e TypeScript (Angular 17) no frontend: Follow standard conventions
 
 ## Recent Changes
-- fix inativação por data: coluna `funcionarias.inativada_em` (DATE); funcionária inativada aparece na grade/Excel até o mês da inativação e some nos meses seguintes. Coluna criada no startup via `ALTER TABLE ... ADD COLUMN IF NOT EXISTS` (plugins/db.js)
+- testes do backend só rodam contra Postgres local: `tests/guardaBancoDeTeste.js` bloqueia `NODE_ENV=production` e host remoto no `DATABASE_URL`
+- inativa fora da grade, dentro do resumo/Excel: funcionária inativa nunca aparece no calendário (filtro `ativa` no frontend), mas entra em totais, Resumo Mensal e Excel dos meses em que tem registros. Regra única em `backend/src/queries/producaoMensal.js` (usada por `/registros` e `/exportacao/excel`). `inativada_em` continua gravada no `PATCH /status` (data ao inativar, NULL ao reativar) apenas como histórico: nenhuma consulta a lê e a API não a devolve; `ativa` é a exclusão lógica pois `registros_diarios` referencia `funcionarias` (ON DELETE RESTRICT)
+- fix interceptor HTTP: lia `error.erro`, mas o backend responde `{ error }`
 - 002-migrate-node-fastify: Added Node.js 20 LTS + JavaScript (CommonJS) + Fastify 5, pg (node-postgres 8.x), ExcelJS 4.x, @fastify/cors, @fastify/static, dotenv
 - 001-compact-calendar-today: Added TypeScript 5.x (Angular 17, standalone components) + Angular Material MDC (`MatSelectModule`, `MatFormFieldModule`, `MatButtonModule`, `MatIconModule`), `CommonModule`, `FormsModule`
 - 001-compact-calendar-today: Added TypeScript (Angular 17) + SCSS inline + Angular Material (`MatSelectModule`, `MatFormFieldModule`, `MatButtonModule`, `MatIconModule`)

@@ -1,6 +1,6 @@
 'use strict'
 
-const COLUNAS = `id, nome, ativa, TO_CHAR(inativada_em, 'YYYY-MM-DD') AS "inativadaEm"`
+const COLUNAS = 'id, nome, ativa'
 
 async function funcionariasRoutes(fastify) {
   // GET /api/funcionarias
@@ -58,8 +58,8 @@ async function funcionariasRoutes(fastify) {
       return reply.code(400).send({ error: 'Campo "ativa" deve ser boolean.' })
     }
     const result = await fastify.db.query(
-      // Guarda a data de inativação: meses até ela continuam mostrando a funcionária,
-      // meses posteriores não. Reativar limpa a data.
+      // Inativar é a "exclusão lógica": a linha fica, pois registros_diarios a referencia.
+      // inativada_em é só histórico (quando saiu): gravada aqui, mas não lida nem devolvida pela API.
       `UPDATE funcionarias
        SET ativa=$1,
            inativada_em = CASE WHEN $1 THEN NULL

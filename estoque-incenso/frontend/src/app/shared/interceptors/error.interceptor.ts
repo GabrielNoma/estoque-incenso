@@ -8,7 +8,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      const mensagem = error.error?.erro ?? mensagemPadrao(error.status);
+      const mensagem = error.error?.error ?? mensagemPadrao(error.status);
       snackBar.open(mensagem, 'Fechar', { duration: 5000 });
       return throwError(() => error);
     })

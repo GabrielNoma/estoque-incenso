@@ -7,7 +7,6 @@ export interface Funcionaria {
   id: number;
   nome: string;
   ativa: boolean;
-  inativadaEm: string | null;
 }
 
 export interface CriarFuncionariaDto {

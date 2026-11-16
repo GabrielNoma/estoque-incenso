@@ -43,7 +43,7 @@ interface ResumoFuncionaria {
 
       <!-- Tabela de resumo -->
       <div class="tabela-container">
-        <table mat-table [dataSource]="resumos" class="tabela-resumo">
+        <table mat-table [dataSource]="resumosExibidos" class="tabela-resumo">
 
           <ng-container matColumnDef="nome">
             <th mat-header-cell *matHeaderCellDef>Funcionária</th>
@@ -118,6 +118,8 @@ export class ResumoMensalComponent implements OnChanges {
   @Input() grade: GradeMensal | null = null;
 
   resumos: ResumoFuncionaria[] = [];
+  // Só quem produziu aparece na tabela; os totais somam exatamente as linhas exibidas.
+  resumosExibidos: ResumoFuncionaria[] = [];
   colunas = ['nome', 'totalProduzido', 'atestados', 'faltas', 'outros'];
 
   readonly mesesNomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
@@ -127,14 +129,15 @@ export class ResumoMensalComponent implements OnChanges {
     return this.grade ? this.mesesNomes[this.grade.mes - 1] : '';
   }
 
-  get totalGeral():     number { return this.resumos.reduce((s, r) => s + r.totalProduzido, 0); }
-  get totalAtestados(): number { return this.resumos.reduce((s, r) => s + r.atestados,     0); }
-  get totalFaltas():    number { return this.resumos.reduce((s, r) => s + r.faltas,        0); }
-  get totalOutros():    number { return this.resumos.reduce((s, r) => s + r.outros,        0); }
+  get totalGeral():     number { return this.resumosExibidos.reduce((s, r) => s + r.totalProduzido, 0); }
+  get totalAtestados(): number { return this.resumosExibidos.reduce((s, r) => s + r.atestados,     0); }
+  get totalFaltas():    number { return this.resumosExibidos.reduce((s, r) => s + r.faltas,        0); }
+  get totalOutros():    number { return this.resumosExibidos.reduce((s, r) => s + r.outros,        0); }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['grade'] && this.grade) {
       this.resumos = this.grade.funcionarias.map(f => this.calcularResumo(f));
+      this.resumosExibidos = this.resumos.filter(r => r.totalProduzido > 0);
     }
   }
 

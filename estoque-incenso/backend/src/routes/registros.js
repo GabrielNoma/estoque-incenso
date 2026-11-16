@@ -1,5 +1,7 @@
 'use strict'
 
+const { buscarProducaoDoMes } = require('../queries/producaoMensal')
+
 function rowToRegistro(r) {
   return {
     id: r.id,
@@ -16,38 +18,16 @@ async function registrosRoutes(fastify) {
   fastify.get('/registros', async (request, reply) => {
     const ano = parseInt(request.query.ano, 10)
     const mes = parseInt(request.query.mes, 10)
-    if (!ano || !mes || isNaN(ano) || isNaN(mes)) {
-      return reply.code(400).send({ error: 'Parâmetros "ano" e "mes" são obrigatórios e devem ser inteiros.' })
+    if (!ano || !mes || mes < 1 || mes > 12) {
+      return reply.code(400).send({ error: 'Parâmetros "ano" e "mes" são obrigatórios; "mes" deve estar entre 1 e 12.' })
     }
 
-    const result = await fastify.db.query(`
-      SELECT
-        f.id AS funcionaria_id, f.nome, f.ativa,
-        r.id, TO_CHAR(r.data, 'YYYY-MM-DD') AS data_iso,
-        r.quantidade, r.falta, r.motivo_falta, r.observacao_falta
-      FROM funcionarias f
-      LEFT JOIN registros_diarios r
-        ON r.funcionaria_id = f.id
-        AND EXTRACT(YEAR FROM r.data) = $1
-        AND EXTRACT(MONTH FROM r.data) = $2
-      -- Aparece no mês se: ativa, ou inativada durante/após o mês, ou tem registro no mês
-      WHERE f.ativa = true
-         OR f.inativada_em >= make_date($1::int, $2::int, 1)
-         OR r.id IS NOT NULL
-      ORDER BY f.nome, r.data
-    `, [ano, mes])
-
-    const map = new Map()
-    for (const row of result.rows) {
-      if (!map.has(row.funcionaria_id)) {
-        map.set(row.funcionaria_id, { id: row.funcionaria_id, nome: row.nome, ativa: row.ativa, registros: [] })
-      }
-      if (row.id != null) {
-        map.get(row.funcionaria_id).registros.push(rowToRegistro(row))
-      }
+    const funcionarias = await buscarProducaoDoMes(fastify.db, ano, mes)
+    return {
+      ano,
+      mes,
+      funcionarias: funcionarias.map(f => ({ ...f, registros: f.registros.map(rowToRegistro) })),
     }
-
-    return { ano, mes, funcionarias: Array.from(map.values()) }
   })
 
   // PUT /api/registros

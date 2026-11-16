@@ -1,4 +1,4 @@
-import { Component, ElementRef, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, ElementRef, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -66,7 +66,7 @@ import { ResumoMensalComponent } from '../resumo-mensal/resumo-mensal.component'
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let func of grade()!.funcionarias">
+            <tr *ngFor="let func of funcionariasNaGrade()">
               <td class="col-nome">
                 <div class="nome-cell">
                   <span class="avatar avatar-sm nome-avatar">{{ func.nome[0] }}</span>
@@ -124,6 +124,8 @@ export class GradeProducaoComponent implements OnInit {
 
   grade = signal<GradeMensal | null>(null);
   carregando = signal(false);
+  // Inativas ficam fora da grade, mas continuam em grade().funcionarias para totais e resumo.
+  funcionariasNaGrade = computed(() => (this.grade()?.funcionarias ?? []).filter(f => f.ativa));
   mesAtual: MesAno = { ano: new Date().getFullYear(), mes: new Date().getMonth() + 1 };
 
   ngOnInit() {
