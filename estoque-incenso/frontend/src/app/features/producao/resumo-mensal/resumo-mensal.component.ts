@@ -43,7 +43,7 @@ interface ResumoFuncionaria {
 
       <!-- Tabela de resumo -->
       <div class="tabela-container">
-        <table mat-table [dataSource]="resumos" class="tabela-resumo">
+        <table mat-table [dataSource]="resumosExibidos" class="tabela-resumo">
 
           <ng-container matColumnDef="nome">
             <th mat-header-cell *matHeaderCellDef>Funcionária</th>
@@ -118,6 +118,8 @@ export class ResumoMensalComponent implements OnChanges {
   @Input() grade: GradeMensal | null = null;
 
   resumos: ResumoFuncionaria[] = [];
+  // Só quem produziu aparece na tabela; os totais continuam somando todos os resumos.
+  resumosExibidos: ResumoFuncionaria[] = [];
   colunas = ['nome', 'totalProduzido', 'atestados', 'faltas', 'outros'];
 
   readonly mesesNomes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
@@ -135,6 +137,7 @@ export class ResumoMensalComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['grade'] && this.grade) {
       this.resumos = this.grade.funcionarias.map(f => this.calcularResumo(f));
+      this.resumosExibidos = this.resumos.filter(r => r.totalProduzido > 0);
     }
   }
 
