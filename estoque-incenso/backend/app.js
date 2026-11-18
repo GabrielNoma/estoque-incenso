@@ -17,6 +17,7 @@ function buildApp() {
   app.register(require('./src/routes/funcionarias'), { prefix: '/api' })
   app.register(require('./src/routes/registros'), { prefix: '/api' })
   app.register(require('./src/routes/exportacao'), { prefix: '/api' })
+  app.register(require('./src/routes/pedidoBot'), { prefix: '/api' })
 
   return app
 }

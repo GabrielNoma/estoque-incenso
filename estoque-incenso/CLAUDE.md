@@ -1,4 +1,4 @@
-﻿# estoque-incenso Development Guidelines
+# estoque-incenso Development Guidelines
 
 Auto-generated from all feature plans. Last updated: 2026-05-13
 
@@ -26,6 +26,7 @@ npm test; npm run lint
 JavaScript (Node.js 20, CommonJS) no backend e TypeScript (Angular 17) no frontend: Follow standard conventions
 
 ## Recent Changes
+- 003-pedido-bot-chat: tela `/pedidos` (chat com o robô de pedidos, exportar/importar modelo). Backend `backend/src/routes/pedidoBot.js` faz proxy para a API do robô (`PEDIDO_BOT_URL`, timeout `PEDIDO_BOT_TIMEOUT_MS`, padrão 90000); falha/timeout responde 503 `{ error }`. Interceptor HTTP ganhou `SEM_AVISO_DE_ERRO` (HttpContextToken) para telas que mostram o próprio erro
 - testes do backend só rodam contra Postgres local: `tests/guardaBancoDeTeste.js` bloqueia `NODE_ENV=production` e host remoto no `DATABASE_URL`
 - inativa fora da grade, dentro do resumo/Excel: funcionária inativa nunca aparece no calendário (filtro `ativa` no frontend), mas entra em totais, Resumo Mensal e Excel dos meses em que tem registros. Regra única em `backend/src/queries/producaoMensal.js` (usada por `/registros` e `/exportacao/excel`). `inativada_em` continua gravada no `PATCH /status` (data ao inativar, NULL ao reativar) apenas como histórico: nenhuma consulta a lê e a API não a devolve; `ativa` é a exclusão lógica pois `registros_diarios` referencia `funcionarias` (ON DELETE RESTRICT)
 - fix interceptor HTTP: lia `error.erro`, mas o backend responde `{ error }`
