@@ -14,6 +14,18 @@ const timeoutDoBot = () => Number(process.env.PEDIDO_BOT_TIMEOUT_MS) || 240000
 const chaveDoBot = () => process.env.PEDIDO_BOT_API_KEY || ''
 
 class BotIndisponivelError extends Error {}
+
+// Por que o robô está indisponível, SEM expor a chave nem a mensagem do erro (a do cabeçalho inválido repete o valor).
+function classificarFalha(err, { url, chave }) {
+  if (err && err.name === 'AbortError') return 'tempo_esgotado'
+  if (!URL.canParse(url)) return 'url_invalida'
+  if (chave && !/^[\x21-\x7E]+$/.test(chave)) return 'chave_com_caracteres_invalidos'
+  const codigo = err && err.cause && err.cause.code
+  if (codigo === 'ECONNREFUSED') return 'conexao_recusada'
+  if (codigo === 'ENOTFOUND') return 'endereco_nao_encontrado'
+  if (typeof codigo === 'string' && /^[A-Z_]+$/.test(codigo)) return codigo
+  return (err && err.name) || 'erro_desconhecido'
+}
 class BotAcessoRecusadoError extends Error {}
 class BotLimiteError extends Error {}
 
@@ -29,7 +41,7 @@ async function chamarBot(caminho, opcoes = {}) {
     resposta = await fetch(`${urlDoBot()}${caminho}`, { ...opcoes, headers, signal: controle.signal })
     corpo = Buffer.from(await resposta.arrayBuffer())
   } catch (err) {
-    throw new BotIndisponivelError(err.name)
+    throw new BotIndisponivelError(classificarFalha(err, { url: `${urlDoBot()}${caminho}`, chave: chaveDoBot() }))
   } finally {
     clearTimeout(temporizador)
   }
@@ -123,3 +135,4 @@ async function pedidoBotRoutes(fastify) {
 }
 
 module.exports = pedidoBotRoutes
+module.exports.classificarFalha = classificarFalha

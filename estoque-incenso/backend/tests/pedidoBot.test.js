@@ -289,3 +289,36 @@ test('a resposta de recusa não carrega a chave nem o texto do pedido', async ()
     assert.ok(!res.payload.includes(CHAVE_TESTE) && !res.payload.includes('texto-secreto-do-pedido'))
   } finally { delete process.env.PEDIDO_BOT_API_KEY }
 })
+
+// -- diagnóstico: o log diz POR QUE o robô está indisponível, sem vazar a chave nem o texto ---------------------
+const { classificarFalha } = require('../src/routes/pedidoBot')
+
+test('classificarFalha: url sem protocolo, chave com caracteres inválidos, recusa de conexão e tempo esgotado', () => {
+  const tipo = new TypeError('fetch failed')
+  assert.equal(classificarFalha(new TypeError('x'), { url: 'pedido-bot.onrender.com', chave: 'abc' }), 'url_invalida')
+  assert.equal(classificarFalha(new TypeError('x'), { url: 'https://ok.onrender.com', chave: 'abc\ndef' }), 'chave_com_caracteres_invalidos')
+  assert.equal(classificarFalha(new TypeError('x'), { url: 'https://ok.onrender.com', chave: 'abc def' }), 'chave_com_caracteres_invalidos')
+  assert.equal(classificarFalha(new TypeError('x'), { url: 'https://ok.onrender.com', chave: 'chave••••' }), 'chave_com_caracteres_invalidos')
+  const recusada = Object.assign(new TypeError('fetch failed'), { cause: { code: 'ECONNREFUSED' } })
+  assert.equal(classificarFalha(recusada, { url: 'http://127.0.0.1:8000', chave: '' }), 'conexao_recusada')
+  const semDns = Object.assign(new TypeError('fetch failed'), { cause: { code: 'ENOTFOUND' } })
+  assert.equal(classificarFalha(semDns, { url: 'https://nao-existe.exemplo', chave: '' }), 'endereco_nao_encontrado')
+  assert.equal(classificarFalha(Object.assign(new Error('x'), { name: 'AbortError' }), { url: 'https://ok.exemplo', chave: '' }), 'tempo_esgotado')
+  assert.equal(classificarFalha(tipo, { url: 'https://ok.exemplo', chave: 'abc' }), 'TypeError')
+})
+
+test('classificarFalha nunca devolve o valor da chave nem a mensagem do erro', () => {
+  const erro = new TypeError('Headers.append: "Bearer SEGREDO" is an invalid header value.')
+  const motivo = classificarFalha(erro, { url: 'https://ok.exemplo', chave: 'SEGREDO\n' })
+  assert.ok(!motivo.includes('SEGREDO') && !motivo.includes('Headers'))
+})
+
+test('com a URL do robô sem protocolo a tela recebe o aviso em português (e o motivo vai só para o log)', async () => {
+  const anterior = process.env.PEDIDO_BOT_URL
+  process.env.PEDIDO_BOT_URL = 'pedido-bot.onrender.com'
+  try {
+    const res = await app.inject({ method: 'GET', url: '/api/pedido-bot/modelo/info' })
+    assert.equal(res.statusCode, 503)
+    assert.deepEqual(res.json(), { error: MSG_INDISPONIVEL })
+  } finally { process.env.PEDIDO_BOT_URL = anterior }
+})
