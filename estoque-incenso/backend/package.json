@@ -9,7 +9,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "test": "node --test tests/guardaBancoDeTeste.test.js tests/funcionarias.test.js tests/registros.test.js tests/exportacao.test.js"
+    "test": "node --test tests/guardaBancoDeTeste.test.js tests/funcionarias.test.js tests/registros.test.js tests/exportacao.test.js tests/pedidoBot.test.js"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.2",

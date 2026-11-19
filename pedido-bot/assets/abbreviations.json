@@ -1,0 +1,20 @@
+{
+  "expansoes": {
+    "c": "caminho",
+    "t": "todos",
+    "sra": "senhora",
+    "des": "desatadora",
+    "def": "defesa",
+    "defumador": "defesa"
+  },
+  "variantes": {
+    "s": [
+      "santo",
+      "santa",
+      "saude"
+    ],
+    "7": [
+      "sete"
+    ]
+  }
+}

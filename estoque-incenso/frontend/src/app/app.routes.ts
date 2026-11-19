@@ -11,5 +11,10 @@ export const routes: Routes = [
     path: 'funcionarias',
     loadComponent: () => import('./features/funcionarias/funcionarias.component')
       .then(m => m.FuncionariasComponent)
+  },
+  {
+    path: 'pedidos',
+    loadComponent: () => import('./features/pedido-bot/pedido-bot.component')
+      .then(m => m.PedidoBotComponent)
   }
 ];

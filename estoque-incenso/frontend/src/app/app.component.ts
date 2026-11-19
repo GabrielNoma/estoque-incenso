@@ -36,6 +36,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
             <mat-icon>group</mat-icon>
             <span class="nav-label">Funcionárias</span>
           </a>
+          <a routerLink="/pedidos" routerLinkActive="active" class="nav-item"
+             matTooltip="Pedidos" matTooltipPosition="right" matTooltipShowDelay="300">
+            <mat-icon>chat</mat-icon>
+            <span class="nav-label">Pedidos</span>
+          </a>
         </nav>
 
         <div class="sidebar-footer">

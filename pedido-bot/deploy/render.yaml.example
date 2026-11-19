@@ -1,0 +1,39 @@
+# EXEMPLO de configuração do bot no Render (não é usado automaticamente: copie para a raiz do repositório
+# como render.yaml, ou crie o serviço pelo painel com os mesmos valores).
+# Os segredos usam `sync: false`: o Render pede o valor na criação e ele NUNCA entra no repositório.
+services:
+  - type: web
+    name: pedido-bot
+    runtime: docker
+    rootDir: pedido-bot
+    dockerfilePath: ./Dockerfile
+    plan: free            # o plano gratuito dorme sem uso; para WhatsApp prefira um plano pago pequeno
+    healthCheckPath: /saude
+    autoDeploy: false     # o deploy é disparado pelo CI (deploy hook) depois dos testes
+    # Migrações: rodam ANTES de cada versão nova. Em planos que aceitam, use o comando de pré-deploy:
+    # preDeployCommand: python -m pedido.migrate
+    # (o CI do repositório também aplica as migrações antes de disparar o deploy)
+    envVars:
+      - key: ENVIRONMENT
+        value: producao
+      - key: LLM_PROVIDER
+        value: anthropic
+      - key: LLM_MODEL
+        value: claude-haiku-5-5
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: API_KEYS
+        sync: false
+      - key: EMBED_BASE_URL
+        sync: false
+      - key: EMBED_MODEL
+        sync: false
+      - key: EMBED_API_KEY
+        sync: false
+      - key: EMBED_DIMENSIONS
+        value: "1024"
+      - key: EMBED_SEND_DIMENSIONS
+        value: "true"
+      # PORT: o Render define sozinho; não declare.

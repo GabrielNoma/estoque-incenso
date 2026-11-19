@@ -123,3 +123,12 @@
   background: var(--color-background);
   min-width: 0;
 }
+
+/* Telas estreitas: menu lateral recolhido (só ícones) para sobrar espaço ao conteúdo */
+@media (max-width: 600px) {
+  .sidebar { width: var(--sidebar-width-collapsed); }
+  .brand-name, .nav-label, .sidebar-version { display: none; }
+  .sidebar-brand { justify-content: center; padding-left: 0; padding-right: 0; }
+  .nav-item { justify-content: center; }
+  .main-content { padding: var(--space-3); }
+}

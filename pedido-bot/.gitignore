@@ -1,0 +1,19 @@
+# Segredos e ambiente local: NUNCA versionar
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# Sistema e editor
+.DS_Store
+.idea/
+.vscode/
+
+# Local
+.claude/settings.local.json

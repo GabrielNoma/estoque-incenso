@@ -1,0 +1,374 @@
+{
+  "descricao": "Cada linha: o texto como o cliente escreveu, a quantidade em duzias (o modelo converte unidades) e o produto PRETENDIDO (null quando nao ha produto pretendido).",
+  "mensagens": [
+    {
+      "arquivo": "01_simples.txt",
+      "linhas": [
+        {
+          "texto": "abre caminho",
+          "quantidade": 2,
+          "produto": "Abre Caminho"
+        },
+        {
+          "texto": "sao jorge",
+          "quantidade": 3,
+          "produto": "São Jorge"
+        },
+        {
+          "texto": "ogum",
+          "quantidade": 1,
+          "produto": "Ogum"
+        }
+      ]
+    },
+    {
+      "arquivo": "02_meia_duzia.txt",
+      "linhas": [
+        {
+          "texto": "arruda",
+          "quantidade": 0.5,
+          "produto": "Arruda"
+        },
+        {
+          "texto": "alecrim",
+          "quantidade": 0.5,
+          "produto": "Alecrim"
+        }
+      ]
+    },
+    {
+      "arquivo": "03_abreviacoes.txt",
+      "linhas": [
+        {
+          "texto": "abre c. da felicidade",
+          "quantidade": 1,
+          "produto": "Abre C. da Felicidade"
+        },
+        {
+          "texto": "abre c. do dinheiro",
+          "quantidade": 2,
+          "produto": "Abre C. do Dinheiro"
+        },
+        {
+          "texto": "abre t. os caminhos",
+          "quantidade": 1,
+          "produto": "Abre T. os Caminhos"
+        }
+      ]
+    },
+    {
+      "arquivo": "04_familia_abre_typo.txt",
+      "linhas": [
+        {
+          "texto": "abre camino",
+          "quantidade": 1,
+          "produto": "Abre Caminho"
+        },
+        {
+          "texto": "abre c felicidade",
+          "quantidade": 1,
+          "produto": "Abre C. da Felicidade"
+        }
+      ]
+    },
+    {
+      "arquivo": "05_acentos_e_caixa.txt",
+      "linhas": [
+        {
+          "texto": "ILUMINA T. OS CAMINHOS",
+          "quantidade": 2,
+          "produto": "Ilumina T. os Caminhos"
+        },
+        {
+          "texto": "iemanja",
+          "quantidade": 1,
+          "produto": "Iemanjá"
+        },
+        {
+          "texto": "ze pilintra",
+          "quantidade": 3,
+          "produto": "Zé Pilintra"
+        }
+      ]
+    },
+    {
+      "arquivo": "06_varios_na_linha.txt",
+      "linhas": [
+        {
+          "texto": "arruda",
+          "quantidade": 2,
+          "produto": "Arruda"
+        },
+        {
+          "texto": "alecrim",
+          "quantidade": 1,
+          "produto": "Alecrim"
+        },
+        {
+          "texto": "guine",
+          "quantidade": 3,
+          "produto": "Guiné"
+        }
+      ]
+    },
+    {
+      "arquivo": "07_fora_do_catalogo.txt",
+      "linhas": [
+        {
+          "texto": "incenso de lavanda azul",
+          "quantidade": 2,
+          "produto": null
+        },
+        {
+          "texto": "sal grosso",
+          "quantidade": 1,
+          "produto": "Sal Grosso"
+        }
+      ]
+    },
+    {
+      "arquivo": "08_unidade_nao_duzia.txt",
+      "linhas": [
+        {
+          "texto": "arruda",
+          "quantidade": 3,
+          "produto": "Arruda"
+        }
+      ]
+    },
+    {
+      "arquivo": "09_duplicado.txt",
+      "linhas": [
+        {
+          "texto": "sao jorge",
+          "quantidade": 2,
+          "produto": "São Jorge"
+        },
+        {
+          "texto": "são jorge",
+          "quantidade": 1,
+          "produto": "São Jorge"
+        }
+      ]
+    },
+    {
+      "arquivo": "10_sem_pedido.txt",
+      "linhas": []
+    },
+    {
+      "arquivo": "11_defesa_defumador.txt",
+      "linhas": [
+        {
+          "texto": "defumador do preto velho",
+          "quantidade": 1,
+          "produto": "Def.do Preto Velho"
+        },
+        {
+          "texto": "defesa dos caboclos",
+          "quantidade": 2,
+          "produto": "Def.dos Caboclos"
+        },
+        {
+          "texto": "def indiano",
+          "quantidade": 1,
+          "produto": "Def. Indiano"
+        }
+      ]
+    },
+    {
+      "arquivo": "12_nossa_senhora.txt",
+      "linhas": [
+        {
+          "texto": "nossa senhora desatadora dos nos",
+          "quantidade": 1,
+          "produto": "Nossa Sra.Des.dos Nos"
+        },
+        {
+          "texto": "nossa sra aparecida",
+          "quantidade": 1,
+          "produto": "Nossa Sra Aparecida"
+        }
+      ]
+    },
+    {
+      "arquivo": "13_sete_familia.txt",
+      "linhas": [
+        {
+          "texto": "7 linhas",
+          "quantidade": 1,
+          "produto": "7 Linhas"
+        },
+        {
+          "texto": "sete linhas",
+          "quantidade": 1,
+          "produto": "7 Linhas"
+        }
+      ]
+    },
+    {
+      "arquivo": "14_quebra_typo.txt",
+      "linhas": [
+        {
+          "texto": "quebra mau olhdo",
+          "quantidade": 2,
+          "produto": "Quebra Mau Olhado"
+        }
+      ]
+    },
+    {
+      "arquivo": "15_fuzzy_seguro.txt",
+      "linhas": [
+        {
+          "texto": "descarrego completto",
+          "quantidade": 1,
+          "produto": "Descarrego Completo"
+        },
+        {
+          "texto": "mensageiro da paaz",
+          "quantidade": 1,
+          "produto": "Mensageiro da Paz"
+        }
+      ]
+    },
+    {
+      "arquivo": "16_quantidades_por_extenso.txt",
+      "linhas": [
+        {
+          "texto": "ogum",
+          "quantidade": 1,
+          "produto": "Ogum"
+        },
+        {
+          "texto": "exu",
+          "quantidade": 2,
+          "produto": "Exu"
+        },
+        {
+          "texto": "oxum",
+          "quantidade": 3,
+          "produto": "Oxum"
+        }
+      ]
+    },
+    {
+      "arquivo": "17_lista_longa.txt",
+      "linhas": [
+        {
+          "texto": "Abre Caminho",
+          "quantidade": 2,
+          "produto": "Abre Caminho"
+        },
+        {
+          "texto": "Chama Cliente",
+          "quantidade": 1,
+          "produto": "Chama Cliente"
+        },
+        {
+          "texto": "Chama Dinheiro",
+          "quantidade": 1,
+          "produto": "Chama Dinheiro"
+        },
+        {
+          "texto": "Chama Emprego",
+          "quantidade": 1,
+          "produto": "Chama Emprego"
+        },
+        {
+          "texto": "Chama Sorte",
+          "quantidade": 2,
+          "produto": "Chama Sorte"
+        },
+        {
+          "texto": "Tranca Rua",
+          "quantidade": 1,
+          "produto": "Tranca Rua"
+        },
+        {
+          "texto": "Vence Tudo",
+          "quantidade": 1,
+          "produto": "Vence Tudo"
+        },
+        {
+          "texto": "Lavanda",
+          "quantidade": 3,
+          "produto": "Lavanda"
+        }
+      ]
+    },
+    {
+      "arquivo": "18_chama_generico.txt",
+      "linhas": [
+        {
+          "texto": "chama",
+          "quantidade": 2,
+          "produto": null
+        }
+      ]
+    },
+    {
+      "arquivo": "19_rosa_generica.txt",
+      "linhas": [
+        {
+          "texto": "rosa",
+          "quantidade": 1,
+          "produto": null
+        }
+      ]
+    },
+    {
+      "arquivo": "20_mistura_de_erros.txt",
+      "linhas": [
+        {
+          "texto": "s. jorge",
+          "quantidade": 1,
+          "produto": "São Jorge"
+        },
+        {
+          "texto": "santo antonio",
+          "quantidade": 2,
+          "produto": "Santo Antonio"
+        },
+        {
+          "texto": "sta rita",
+          "quantidade": 1,
+          "produto": "Santa Rita"
+        }
+      ]
+    },
+    {
+      "arquivo": "21_tira_duas.txt",
+      "linhas": [
+        {
+          "texto": "tira peso",
+          "quantidade": 1,
+          "produto": "Tira Peso"
+        },
+        {
+          "texto": "tira azar",
+          "quantidade": 1,
+          "produto": "Tira Azar"
+        }
+      ]
+    },
+    {
+      "arquivo": "22_santa_defesa.txt",
+      "linhas": [
+        {
+          "texto": "santa defesa santa paz e protecao",
+          "quantidade": 1,
+          "produto": "S. Def.S.Paz e Proteção"
+        },
+        {
+          "texto": "s. def. s. paz e proteção",
+          "quantidade": 2,
+          "produto": "S. Def.S.Paz e Proteção"
+        },
+        {
+          "texto": "santo defesa paz e protecao",
+          "quantidade": 1,
+          "produto": "S. Def.S.Paz e Proteção"
+        }
+      ]
+    }
+  ]
+}
