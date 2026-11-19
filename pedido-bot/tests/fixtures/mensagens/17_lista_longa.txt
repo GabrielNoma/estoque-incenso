@@ -1,0 +1,9 @@
+Pedido:
+- 2 dz Abre Caminho
+- 1 dz Chama Cliente
+- 1 dz Chama Dinheiro
+- 1 dz Chama Emprego
+- 2 dz Chama Sorte
+- 1 dz Tranca Rua
+- 1 dz Vence Tudo
+- 3 dz Lavanda

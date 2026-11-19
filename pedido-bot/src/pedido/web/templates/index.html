@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ m.PAGINA_TITULO }}</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <header>
+    <h1>{{ m.PAGINA_TITULO }}</h1>
+    <p class="sub">{{ m.PAGINA_SUBTITULO }}</p>
+    <label for="telefone">{{ m.PAGINA_TELEFONE }}</label>
+    <input id="telefone" type="text" inputmode="numeric" value="5511999990000" autocomplete="off" placeholder="{{ m.PAGINA_TELEFONE }}" title="{{ m.PAGINA_TELEFONE }}">
+  </header>
+
+  <main id="conversa" aria-live="polite"></main>
+
+  <form id="formulario" autocomplete="off">
+    <input id="texto" type="text" placeholder="{{ m.PAGINA_CAMPO }}" aria-label="{{ m.PAGINA_CAMPO }}">
+    <button id="enviar" type="submit">{{ m.PAGINA_ENVIAR }}</button>
+  </form>
+
+  <script>
+    window.TEXTOS = {baixar: {{ m.PAGINA_BAIXAR | tojson }}, semRede: {{ m.PAGINA_SEM_REDE | tojson }}};
+  </script>
+  <script src="/static/app.js"></script>
+</body>
+</html>

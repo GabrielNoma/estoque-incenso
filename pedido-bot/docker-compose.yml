@@ -1,0 +1,20 @@
+# Postgres local para desenvolvimento e testes (a porta 5434 evita conflito com um Postgres local; o pgvector não é mais necessário)
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: pedido
+      POSTGRES_PASSWORD: pedido
+      POSTGRES_DB: pedido
+    ports:
+      - "5434:5432"
+    volumes:
+      - pedido_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pedido -d pedido"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pedido_pgdata:

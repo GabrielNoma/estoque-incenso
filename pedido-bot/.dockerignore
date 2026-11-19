@@ -1,0 +1,19 @@
+# Segredos e ambiente local
+.env
+.env.*
+!.env.example
+
+# Fora da imagem
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+tests
+specs
+.specify
+.claude
+docs
+deploy
+scripts
+.gitignore
+docker-compose.yml

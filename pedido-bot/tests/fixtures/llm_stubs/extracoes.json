@@ -1,0 +1,253 @@
+{
+  "01_simples.txt": [
+    {
+      "texto": "abre caminho",
+      "quantidade": 2
+    },
+    {
+      "texto": "sao jorge",
+      "quantidade": 3
+    },
+    {
+      "texto": "ogum",
+      "quantidade": 1
+    }
+  ],
+  "02_meia_duzia.txt": [
+    {
+      "texto": "arruda",
+      "quantidade": 0.5
+    },
+    {
+      "texto": "alecrim",
+      "quantidade": 0.5
+    }
+  ],
+  "03_abreviacoes.txt": [
+    {
+      "texto": "abre c. da felicidade",
+      "quantidade": 1
+    },
+    {
+      "texto": "abre c. do dinheiro",
+      "quantidade": 2
+    },
+    {
+      "texto": "abre t. os caminhos",
+      "quantidade": 1
+    }
+  ],
+  "04_familia_abre_typo.txt": [
+    {
+      "texto": "abre camino",
+      "quantidade": 1
+    },
+    {
+      "texto": "abre c felicidade",
+      "quantidade": 1
+    }
+  ],
+  "05_acentos_e_caixa.txt": [
+    {
+      "texto": "ILUMINA T. OS CAMINHOS",
+      "quantidade": 2
+    },
+    {
+      "texto": "iemanja",
+      "quantidade": 1
+    },
+    {
+      "texto": "ze pilintra",
+      "quantidade": 3
+    }
+  ],
+  "06_varios_na_linha.txt": [
+    {
+      "texto": "arruda",
+      "quantidade": 2
+    },
+    {
+      "texto": "alecrim",
+      "quantidade": 1
+    },
+    {
+      "texto": "guine",
+      "quantidade": 3
+    }
+  ],
+  "07_fora_do_catalogo.txt": [
+    {
+      "texto": "incenso de lavanda azul",
+      "quantidade": 2
+    },
+    {
+      "texto": "sal grosso",
+      "quantidade": 1
+    }
+  ],
+  "08_unidade_nao_duzia.txt": [
+    {
+      "texto": "arruda",
+      "quantidade": 3
+    }
+  ],
+  "09_duplicado.txt": [
+    {
+      "texto": "sao jorge",
+      "quantidade": 2
+    },
+    {
+      "texto": "são jorge",
+      "quantidade": 1
+    }
+  ],
+  "10_sem_pedido.txt": [],
+  "11_defesa_defumador.txt": [
+    {
+      "texto": "defumador do preto velho",
+      "quantidade": 1
+    },
+    {
+      "texto": "defesa dos caboclos",
+      "quantidade": 2
+    },
+    {
+      "texto": "def indiano",
+      "quantidade": 1
+    }
+  ],
+  "12_nossa_senhora.txt": [
+    {
+      "texto": "nossa senhora desatadora dos nos",
+      "quantidade": 1
+    },
+    {
+      "texto": "nossa sra aparecida",
+      "quantidade": 1
+    }
+  ],
+  "13_sete_familia.txt": [
+    {
+      "texto": "7 linhas",
+      "quantidade": 1
+    },
+    {
+      "texto": "sete linhas",
+      "quantidade": 1
+    }
+  ],
+  "14_quebra_typo.txt": [
+    {
+      "texto": "quebra mau olhdo",
+      "quantidade": 2
+    }
+  ],
+  "15_fuzzy_seguro.txt": [
+    {
+      "texto": "descarrego completto",
+      "quantidade": 1
+    },
+    {
+      "texto": "mensageiro da paaz",
+      "quantidade": 1
+    }
+  ],
+  "16_quantidades_por_extenso.txt": [
+    {
+      "texto": "ogum",
+      "quantidade": 1
+    },
+    {
+      "texto": "exu",
+      "quantidade": 2
+    },
+    {
+      "texto": "oxum",
+      "quantidade": 3
+    }
+  ],
+  "17_lista_longa.txt": [
+    {
+      "texto": "Abre Caminho",
+      "quantidade": 2
+    },
+    {
+      "texto": "Chama Cliente",
+      "quantidade": 1
+    },
+    {
+      "texto": "Chama Dinheiro",
+      "quantidade": 1
+    },
+    {
+      "texto": "Chama Emprego",
+      "quantidade": 1
+    },
+    {
+      "texto": "Chama Sorte",
+      "quantidade": 2
+    },
+    {
+      "texto": "Tranca Rua",
+      "quantidade": 1
+    },
+    {
+      "texto": "Vence Tudo",
+      "quantidade": 1
+    },
+    {
+      "texto": "Lavanda",
+      "quantidade": 3
+    }
+  ],
+  "18_chama_generico.txt": [
+    {
+      "texto": "chama",
+      "quantidade": 2
+    }
+  ],
+  "19_rosa_generica.txt": [
+    {
+      "texto": "rosa",
+      "quantidade": 1
+    }
+  ],
+  "20_mistura_de_erros.txt": [
+    {
+      "texto": "s. jorge",
+      "quantidade": 1
+    },
+    {
+      "texto": "santo antonio",
+      "quantidade": 2
+    },
+    {
+      "texto": "sta rita",
+      "quantidade": 1
+    }
+  ],
+  "21_tira_duas.txt": [
+    {
+      "texto": "tira peso",
+      "quantidade": 1
+    },
+    {
+      "texto": "tira azar",
+      "quantidade": 1
+    }
+  ],
+  "22_santa_defesa.txt": [
+    {
+      "texto": "santa defesa santa paz e protecao",
+      "quantidade": 1
+    },
+    {
+      "texto": "s. def. s. paz e proteção",
+      "quantidade": 2
+    },
+    {
+      "texto": "santo defesa paz e protecao",
+      "quantidade": 1
+    }
+  ]
+}

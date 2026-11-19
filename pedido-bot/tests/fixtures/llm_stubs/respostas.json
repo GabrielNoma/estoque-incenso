@@ -1,0 +1,11 @@
+{
+  "nulo": {
+    "produto_id": null
+  },
+  "fora_dos_candidatos": {
+    "produto_id": 999999
+  },
+  "extracao_malformada": {
+    "linhas": "isto nao e uma lista"
+  }
+}
