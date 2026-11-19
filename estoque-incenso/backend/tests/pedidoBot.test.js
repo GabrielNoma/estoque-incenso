@@ -211,3 +211,81 @@ test('timeout do robô responde 503', async () => {
     process.env.PEDIDO_BOT_TIMEOUT_MS = '90000'
   }
 })
+
+// -- chave de acesso do robô (bot em produção exige Authorization em toda rota, menos /saude) -------------------
+const CHAVE_TESTE = 'chave-de-teste-do-estoque-com-mais-de-32-caracteres'
+const MSG_ACESSO = 'O serviço de pedidos recusou o acesso. Avise o responsável: a chave do robô precisa ser conferida.'
+const MSG_MUITAS = 'Muitas mensagens seguidas. Aguarde um instante e tente de novo.'
+
+const ROTAS = [
+  { metodo: 'POST', url: '/api/pedido-bot/mensagem', payload: { conversaId: 'c', texto: 'ogum' } },
+  { metodo: 'GET', url: '/api/pedido-bot/planilha/12' },
+  { metodo: 'GET', url: '/api/pedido-bot/modelo' },
+  { metodo: 'GET', url: '/api/pedido-bot/modelo/info' },
+  { metodo: 'POST', url: '/api/pedido-bot/modelo', payload: Buffer.from('xlsx'),
+    headers: { 'content-type': 'application/octet-stream' } },
+]
+
+function injetar(rota) {
+  return app.inject({ method: rota.metodo, url: rota.url, payload: rota.payload, headers: rota.headers })
+}
+
+test('com PEDIDO_BOT_API_KEY, toda chamada ao robô leva Authorization: Bearer; a chave nunca volta ao navegador', async () => {
+  process.env.PEDIDO_BOT_API_KEY = CHAVE_TESTE
+  try {
+    for (const rota of ROTAS) {
+      recebido = null
+      const res = await injetar(rota)
+      assert.equal(recebido.headers.authorization, `Bearer ${CHAVE_TESTE}`, rota.url)
+      assert.ok(!res.payload.includes(CHAVE_TESTE) && !JSON.stringify(res.headers).includes(CHAVE_TESTE), rota.url)
+    }
+  } finally { delete process.env.PEDIDO_BOT_API_KEY }
+})
+
+test('sem PEDIDO_BOT_API_KEY, nenhum cabeçalho Authorization é enviado (uso local)', async () => {
+  delete process.env.PEDIDO_BOT_API_KEY
+  await injetar(ROTAS[2])
+  assert.equal(recebido.headers.authorization, undefined)
+})
+
+test('401 e 403 do robô viram 502 com aviso em português, em todas as rotas, sem vazar o corpo do robô', async () => {
+  for (const status of [401, 403]) {
+    for (const rota of ROTAS) {
+      comportamento = { status, json: { erro: 'chave_invalida', mensagem: 'Chave de acesso inválida.' } }
+      const res = await injetar(rota)
+      assert.equal(res.statusCode, 502, `${status} ${rota.url}`)
+      assert.deepEqual(res.json(), { error: MSG_ACESSO })
+    }
+  }
+})
+
+test('429 do robô vira 429 com aviso em português e sem vazar o corpo do robô', async () => {
+  for (const rota of ROTAS) {
+    comportamento = { status: 429, json: { erro: 'muitas_requisicoes', mensagem: 'Muitas requisições.' } }
+    const res = await injetar(rota)
+    assert.equal(res.statusCode, 429, rota.url)
+    assert.deepEqual(res.json(), { error: MSG_MUITAS })
+  }
+})
+
+test('413 e 422 do robô continuam chegando à tela com a mensagem do robô (modelo inválido ou grande)', async () => {
+  comportamento = { status: 422, json: { erro: 'modelo_invalido', mensagem: 'Confira o modelo.' } }
+  const invalido = await injetar(ROTAS[4])
+  assert.equal(invalido.statusCode, 422)
+  assert.equal(invalido.json().mensagem, 'Confira o modelo.')
+  comportamento = { status: 413, json: { erro: 'modelo_grande', mensagem: 'Arquivo grande demais.' } }
+  const grande = await injetar(ROTAS[4])
+  assert.equal(grande.statusCode, 413)
+  assert.equal(grande.json().mensagem, 'Arquivo grande demais.')
+})
+
+test('a resposta de recusa não carrega a chave nem o texto do pedido', async () => {
+  process.env.PEDIDO_BOT_API_KEY = CHAVE_TESTE
+  try {
+    comportamento = { status: 401, json: { erro: 'chave_invalida', mensagem: 'x' } }
+    const res = await app.inject({ method: 'POST', url: '/api/pedido-bot/mensagem',
+      payload: { conversaId: 'segredo-da-conversa', texto: 'texto-secreto-do-pedido' } })
+    assert.equal(res.statusCode, 502)
+    assert.ok(!res.payload.includes(CHAVE_TESTE) && !res.payload.includes('texto-secreto-do-pedido'))
+  } finally { delete process.env.PEDIDO_BOT_API_KEY }
+})
