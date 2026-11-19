@@ -1,12 +1,47 @@
 name: Test and Deploy
 
+# Um repositório, dois serviços no Render: o estoque (Node + Angular) e o bot de pedidos (Python).
+# Cada parte só roda quando a pasta dela muda. Em pull requests só testa; o deploy só acontece em push no main.
 on:
   push:
     branches:
       - main
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  test-and-deploy:
+  mudancas:
+    runs-on: ubuntu-latest
+    outputs:
+      estoque: ${{ steps.filtro.outputs.estoque }}
+      bot: ${{ steps.filtro.outputs.bot }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detectar o que mudou
+        id: filtro
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            estoque:
+              - 'estoque-incenso/**'
+              - '.github/workflows/deploy.yml'
+              - '.github/scripts/**'
+            bot:
+              - 'pedido-bot/**'
+              - '.github/workflows/deploy.yml'
+              - '.github/scripts/**'
+
+  estoque:
+    needs: mudancas
+    if: needs.mudancas.outputs.estoque == 'true'
     runs-on: ubuntu-latest
 
     services:
@@ -55,67 +90,77 @@ jobs:
         working-directory: estoque-incenso/frontend
         run: npm run build
 
-      - name: Trigger Render Deploy Hook
+      - name: Trigger Render Deploy Hook (estoque)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+          NOME_SECRET: RENDER_DEPLOY_HOOK_URL
+        run: bash .github/scripts/disparar-deploy-render.sh
+
+  bot:
+    needs: mudancas
+    if: needs.mudancas.outputs.bot == 'true'
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        # com a extensão pgvector, que o bot exige
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    defaults:
+      run:
+        working-directory: pedido-bot
+
+    env:
+      # os testes criam o próprio banco (pedido_test) e precisam de um usuário que crie bancos e extensões
+      PEDIDO_TEST_ADMIN_URL: postgresql://postgres:postgres@localhost:5432/postgres
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar o uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: pedido-bot/uv.lock
+
+      - name: Instalar dependências do bot
+        run: uv sync --frozen
+
+      - name: Rodar testes do bot
+        run: uv run pytest -q
+
+      - name: Construir a imagem do container (verifica o Dockerfile)
+        run: docker build -t pedido-bot:ci .
+
+      - name: Aplicar migrações no banco de produção
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          # conexão que aceita DDL (pooler de sessão ou direta do Supabase); só neste passo e só no main
+          DATABASE_URL: ${{ secrets.BOT_DATABASE_URL_MIGRACAO }}
         run: |
-          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
-            echo "::error title=Render Deploy Hook::Secret RENDER_DEPLOY_HOOK_URL não configurado (Settings → Secrets → Actions)."
-            exit 1
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::warning title=Migrações::Secret BOT_DATABASE_URL_MIGRACAO não configurado: migrações NÃO aplicadas. Aplique com 'python -m pedido.migrate' antes do deploy."
+          else
+            uv run python -m pedido.migrate
           fi
 
-          MAX_TENTATIVAS=3
-          ESPERA=10
-          BODY_FILE=$(mktemp)
-
-          for TENTATIVA in $(seq 1 $MAX_TENTATIVAS); do
-            # curl devolve 000 quando não há resposta HTTP (DNS, timeout, TLS...)
-            STATUS=$(curl -sS -o "$BODY_FILE" -w "%{http_code}" \
-                          --connect-timeout 10 --max-time 30 \
-                          -X POST "$RENDER_DEPLOY_HOOK_URL" 2>/tmp/curl_err) || true
-            BODY=$(head -c 500 "$BODY_FILE")
-            echo "Tentativa $TENTATIVA/$MAX_TENTATIVAS — Render Deploy Hook status: $STATUS"
-
-            case "$STATUS" in
-              2??)
-                # 200 OK / 201 Created / 202 Accepted: deploy enfileirado
-                echo "Deploy disparado com sucesso. Resposta: $BODY"
-                echo "### Render: deploy disparado (HTTP $STATUS)" >> "$GITHUB_STEP_SUMMARY"
-                exit 0
-                ;;
-              000)
-                MOTIVO="sem resposta do Render (rede/timeout): $(cat /tmp/curl_err)"
-                RETENTAVEL=1 ;;
-              429)
-                MOTIVO="limite de requisições do Render atingido (429 Too Many Requests)"
-                RETENTAVEL=1 ;;
-              5??)
-                MOTIVO="erro interno do Render ($STATUS) — instabilidade do lado deles"
-                RETENTAVEL=1 ;;
-              401|403)
-                MOTIVO="acesso negado ($STATUS) — a chave do Deploy Hook foi regenerada/revogada? Atualize o secret RENDER_DEPLOY_HOOK_URL"
-                RETENTAVEL=0 ;;
-              404)
-                MOTIVO="Deploy Hook não encontrado (404) — URL errada ou serviço removido no Render. Confira o secret RENDER_DEPLOY_HOOK_URL"
-                RETENTAVEL=0 ;;
-              4??)
-                MOTIVO="requisição rejeitada pelo Render ($STATUS)"
-                RETENTAVEL=0 ;;
-              *)
-                MOTIVO="status inesperado ($STATUS)"
-                RETENTAVEL=0 ;;
-            esac
-
-            if [ "$RETENTAVEL" = "1" ] && [ "$TENTATIVA" -lt "$MAX_TENTATIVAS" ]; then
-              echo "::warning title=Render Deploy Hook::$MOTIVO — nova tentativa em ${ESPERA}s"
-              sleep "$ESPERA"
-              ESPERA=$((ESPERA * 2))
-              continue
-            fi
-            break
-          done
-
-          echo "::error title=Render Deploy Hook falhou::$MOTIVO"
-          [ -n "$BODY" ] && echo "Resposta do Render: $BODY"
-          echo "### Render: deploy NÃO disparado — $MOTIVO" >> "$GITHUB_STEP_SUMMARY"
-          exit 1
+      - name: Trigger Render Deploy Hook (bot)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        working-directory: .
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL_BOT }}
+          NOME_SECRET: RENDER_DEPLOY_HOOK_URL_BOT
+        run: bash .github/scripts/disparar-deploy-render.sh
