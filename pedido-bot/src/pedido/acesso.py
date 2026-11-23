@@ -16,7 +16,7 @@ from pedido.guardrails import RateLimiter
 
 log = logging.getLogger("pedido.acesso")
 
-ESCOPOS = frozenset({"conversa", "modelo"})
+ESCOPOS = frozenset({"conversa", "modelo", "historico"})
 TAMANHO_MINIMO = 32
 
 # Every route of the API and the scope it needs (None = public). A test walks the app against this table.
@@ -27,6 +27,7 @@ REGRAS: dict[tuple[str, str], str | None] = {
     ("GET", "/api/modelo"): "modelo",
     ("POST", "/api/modelo"): "modelo",
     ("GET", "/api/modelo/info"): "modelo",
+    ("GET", "/api/pedidos"): "historico",
 }
 
 

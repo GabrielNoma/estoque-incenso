@@ -108,3 +108,12 @@ def test_logs_hold_only_the_type_and_the_key_name_never_the_key(caplog):
     assert K1 not in caplog.text and K2 not in caplog.text and "c" * 40 not in caplog.text
     assert "acesso=chave_ausente" in caplog.text and "acesso=chave_invalida" in caplog.text
     assert "acesso=sem_permissao chave=whatsapp" in caplog.text
+
+
+def test_the_history_scope_exists_and_is_separate_from_the_others():
+    chave = carregar_chaves(f"painel:historico:{K1},estoque:conversa+modelo+historico:{K2}")
+    assert chave[0].escopos == frozenset({"historico"})
+    assert chave[1].escopos == frozenset({"conversa", "modelo", "historico"})
+    with pytest.raises(ErroApi) as error:  # the WhatsApp-style key (conversa only) cannot read the history
+        Acesso(carregar_chaves(f"whatsapp:conversa:{K1}")).autenticar({"x-api-key": K1}, "historico")
+    assert (error.value.status, error.value.code) == (403, "sem_permissao")

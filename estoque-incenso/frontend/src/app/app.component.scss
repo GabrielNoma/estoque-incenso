@@ -90,9 +90,10 @@
   }
 
   .nav-label {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    // nomes longos (ex.: "Histórico de pedidos bot") quebram em duas linhas em vez de ficarem cortados
+    white-space: normal;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
   }
 
   &:hover {

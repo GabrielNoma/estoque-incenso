@@ -5,6 +5,9 @@ const MENSAGEM_ACESSO = 'O serviço de pedidos recusou o acesso. Avise o respons
 const MENSAGEM_MUITAS = 'Muitas mensagens seguidas. Aguarde um instante e tente de novo.'
 const LIMITE_CORPO_BYTES = 6 * 1024 * 1024
 const XLSX_MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+const ESTADOS_DO_PEDIDO = ['aguardando', 'confirmado', 'recusado', 'substituido']
+// A conversa completa (telefone ou identificador do navegador) nunca chega ao navegador: só o final.
+const mascararConversa = (id) => `…${String(id).slice(-4)}`
 const CABECALHOS_DE_DOWNLOAD = ['content-type', 'content-disposition']
 
 // Lidos a cada chamada para permitir configuração por ambiente (e testes).
@@ -124,6 +127,33 @@ async function pedidoBotRoutes(fastify) {
     const resposta = await chamarBot('/api/modelo', { method: 'POST', headers, body: request.body })
     reply.header('content-type', 'application/json; charset=utf-8')
     return reply.code(resposta.status).send(resposta.corpo)
+  })
+
+  // GET /api/pedido-bot/historico?limite=&antes=&estado=
+  fastify.get('/pedido-bot/historico', async (request, reply) => {
+    const { limite = '50', antes, estado } = request.query || {}
+    const inteiro = (v) => typeof v === 'string' && /^\d+$/.test(v)
+    if (!inteiro(limite) || +limite < 1 || +limite > 200
+        || (antes !== undefined && (!inteiro(antes) || +antes < 1))
+        || (estado !== undefined && !ESTADOS_DO_PEDIDO.includes(estado))) {
+      return reply.code(400).send({ error: 'Filtro inválido.' })
+    }
+    const consulta = new URLSearchParams({ limite })
+    if (antes !== undefined) consulta.set('antes', antes)
+    if (estado !== undefined) consulta.set('estado', estado)
+    const resposta = await chamarBot(`/api/pedidos?${consulta}`)
+    if (resposta.status !== 200) return repassar(reply, resposta)
+
+    const dados = JSON.parse(resposta.corpo.toString('utf-8'))
+    const pedidos = dados.pedidos.map((p) => {
+      const idPlanilha = p.arquivo?.url?.match(/\/pedidos\/(\d+)\/planilha/)?.[1]
+      return {
+        ...p,
+        conversa: mascararConversa(p.conversa),
+        arquivo: idPlanilha ? { nome: p.arquivo.nome, url: `/api/pedido-bot/planilha/${idPlanilha}` } : null,
+      }
+    })
+    return { pedidos, proximo: dados.proximo ?? null }
   })
 
   // GET /api/pedido-bot/modelo/info

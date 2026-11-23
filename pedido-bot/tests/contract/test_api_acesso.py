@@ -9,14 +9,19 @@ from pedido.acesso import REGRAS
 
 CONVERSA = "c" * 40
 MODELO = "m" * 40
+HISTORICO = "h" * 40
 TODAS = "t" * 40
-API_KEYS = f"leitor:conversa:{CONVERSA},admin:modelo:{MODELO},estoque:conversa+modelo:{TODAS}"
+API_KEYS = (f"leitor:conversa:{CONVERSA},admin:modelo:{MODELO},historiador:historico:{HISTORICO},"
+            f"estoque:conversa+modelo+historico:{TODAS}")
+CHAVE_DO_ESCOPO = {"conversa": CONVERSA, "modelo": MODELO, "historico": HISTORICO}
+OUTRA_CHAVE = {"conversa": MODELO, "modelo": CONVERSA, "historico": CONVERSA}
 
 ROTAS = [("POST", "/api/mensagem", "conversa", {"json": {"telefone": "1", "texto": "ogum"}}),
          ("GET", "/api/pedidos/1/planilha", "conversa", {}),
          ("GET", "/api/modelo", "modelo", {}),
          ("GET", "/api/modelo/info", "modelo", {}),
-         ("POST", "/api/modelo", "modelo", {"content": b"x"})]
+         ("POST", "/api/modelo", "modelo", {"content": b"x"}),
+         ("GET", "/api/pedidos", "historico", {})]
 
 
 def chamar(http, metodo, caminho, extra, **headers):
@@ -36,8 +41,7 @@ def test_no_key_and_a_wrong_key_are_401_with_a_portuguese_error(client, metodo, 
 @pytest.mark.parametrize("metodo, caminho, escopo, extra", ROTAS)
 def test_a_key_without_the_scope_is_403_and_the_right_scope_gets_through(client, metodo, caminho, escopo, extra):
     http = client(api_keys=API_KEYS)
-    errada = CONVERSA if escopo == "modelo" else MODELO
-    certa = MODELO if escopo == "modelo" else CONVERSA
+    errada, certa = OUTRA_CHAVE[escopo], CHAVE_DO_ESCOPO[escopo]
     negado = chamar(http, metodo, caminho, extra, Authorization=f"Bearer {errada}")
     assert negado.status_code == 403
     assert negado.json() == {"erro": "sem_permissao", "mensagem": messages.ERROS["sem_permissao"]}

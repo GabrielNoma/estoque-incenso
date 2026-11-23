@@ -54,4 +54,20 @@ describe('PedidoBotService', () => {
     service.infoModelo().subscribe(i => expect(i.versao).toBe(2));
     http.expectOne(`${base}/modelo/info`).flush({ versao: 2, arquivo: 'a.xlsx', produtos: 9, ativado_em: '' });
   });
+
+  it('busca o histórico com limite padrão, cursor e filtro de estado', () => {
+    service.historico().subscribe();
+    const padrao = http.expectOne(r => r.url === `${base}/historico`);
+    expect(padrao.request.params.get('limite')).toBe('50');
+    expect(padrao.request.params.has('antes')).toBeFalse();
+    expect(padrao.request.params.has('estado')).toBeFalse();
+    padrao.flush({ pedidos: [], proximo: null });
+
+    service.historico({ limite: 20, antes: 30, estado: 'confirmado' }).subscribe();
+    const filtrado = http.expectOne(r => r.url === `${base}/historico`);
+    expect(filtrado.request.params.get('limite')).toBe('20');
+    expect(filtrado.request.params.get('antes')).toBe('30');
+    expect(filtrado.request.params.get('estado')).toBe('confirmado');
+    filtrado.flush({ pedidos: [], proximo: null });
+  });
 });

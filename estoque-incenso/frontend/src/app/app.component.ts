@@ -41,6 +41,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
             <mat-icon>chat</mat-icon>
             <span class="nav-label">Pedidos</span>
           </a>
+          <a routerLink="/historico-pedidos-bot" routerLinkActive="active" class="nav-item"
+             matTooltip="Histórico de pedidos bot" matTooltipPosition="right" matTooltipShowDelay="300">
+            <mat-icon>history</mat-icon>
+            <span class="nav-label">Histórico de pedidos bot</span>
+          </a>
         </nav>
 
         <div class="sidebar-footer">

@@ -1,6 +1,7 @@
 # Contrato da API do bot de pedidos
 
-Para quem consome a API: o sistema de estoque e, depois, o adaptador do WhatsApp. Todos os erros são JSON em
+Para quem consome a API: o sistema de estoque e, depois, o adaptador do WhatsApp. A chave do WhatsApp deve ter
+só o escopo `conversa`: o escopo `historico` mostra os pedidos de todos os clientes. Todos os erros são JSON em
 português: `{"erro": "<código>", "mensagem": "<texto>"}`.
 
 ## Chave de acesso
@@ -24,6 +25,7 @@ API_KEYS=estoque:conversa+modelo:<CHAVE1>,whatsapp:conversa:<CHAVE2>
 |---|---|
 | `conversa` | enviar mensagens e baixar a planilha de um pedido confirmado |
 | `modelo` | exportar, importar e consultar o modelo da planilha |
+| `historico` | listar, só para leitura, os pedidos guardados de todas as conversas (e baixar a planilha dos confirmados) |
 
 Gerar uma chave: `python3 -c "import secrets; print(secrets.token_urlsafe(32))"`. Nunca coloque a chave em
 código, em repositório ou em log.
@@ -35,6 +37,7 @@ código, em repositório ou em log.
 | `GET /saude` | nenhum (pública) | `200 {"status":"ok"}` ou `503 {"status":"indisponivel"}`, sem mais nada |
 | `POST /api/mensagem` | `conversa` | recebe `{"telefone","texto"}` e devolve `{"resposta","arquivo"}` |
 | `GET /api/pedidos/{pedido_id}/planilha` | `conversa` | baixa o `.xlsx` de um pedido confirmado |
+| `GET /api/pedidos` | `historico` | lista os pedidos, do mais novo ao mais antigo (`limite` 1 a 200, padrão 50; `antes` = id do último visto; `estado` = aguardando, confirmado, recusado ou substituido) |
 | `GET /api/modelo` | `modelo` | baixa o modelo ativo (`modelo-pedido.xlsx`) |
 | `POST /api/modelo` | `modelo` | importa um novo modelo (corpo = bytes do `.xlsx`) |
 | `GET /api/modelo/info` | `modelo` | versão, arquivo, produtos e data do modelo ativo |
@@ -62,6 +65,9 @@ curl -s -o modelo-pedido.xlsx -H "Authorization: Bearer $CHAVE" https://SEU-BOT/
 # importar um novo modelo
 curl -s -X POST --data-binary @modelo-novo.xlsx -H "Content-Type: application/octet-stream" \
   -H "X-Nome-Arquivo: modelo-novo.xlsx" -H "Authorization: Bearer $CHAVE" https://SEU-BOT/api/modelo
+
+# histórico: os 20 pedidos mais recentes, só os confirmados
+curl -s -H "Authorization: Bearer $CHAVE" "https://SEU-BOT/api/pedidos?limite=20&estado=confirmado"
 
 # informação do modelo ativo
 curl -s -H "Authorization: Bearer $CHAVE" https://SEU-BOT/api/modelo/info

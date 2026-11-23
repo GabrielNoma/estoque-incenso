@@ -1,28 +1,15 @@
 <!--
 Sync Impact Report
-- Version change: 2.2.0 → 2.3.0 (MINOR: a principle added, guidance expanded; nothing removed)
-- Added principles:
-  - IX. Controlled Access — every route except the public ones requires an API key with a scope; keys
-    only from the environment; production switches off the test page and the API docs; hosting binding
+- Version change: 2.3.0 → 2.4.0 (MINOR: a scope and a read-only route added; nothing removed)
 - Modified principles:
-  - V. Deterministic Core, LLM Only to Read — embeddings may come from any OpenAI-compatible hosted
-    service; the vector size is requested from the service when it supports it
-  - VI. Orders Are Persisted — the schema evolves ONLY through ordered, versioned migrations applied by a
-    separate command; the application refuses to start in production with pending or altered migrations
-  - VII. Simplicity and Scope Discipline — in scope now: production readiness of the bot service and the
-    contract the stock system uses; the WhatsApp adapter itself, user accounts and billing stay out
-  - VIII. Guardrails for the Model — cost and abuse guards: daily limit per conversation, explicit
-    maximum output of every language model call, per-key rate limit, body size limit, concurrency cap
-- Modified sections: Technology Constraints (hosting, migrations, hosted embeddings, access control);
-  Development Workflow (feature 006-producao-e-acesso, then the WhatsApp adapter)
-- Removed sections: none
-- Unchanged: I, II, III, IV
+  - IX. Controlled Access — a third scope, `historico` (read-only listing of the stored orders), kept apart
+    from `conversa` because it exposes the orders of EVERY conversation and the WhatsApp key must not have it
+  - VII. Simplicity and Scope Discipline — in scope now: read-only listing of the orders for the stock system;
+    editing or deleting orders through the API stays out of scope
+- Unchanged: I to VI, VIII
 - Deferred/TODO placeholders: none
-- Templates checked: .specify/templates/plan-template.md, spec-template.md, tasks-template.md read
-  this file at command time; no edits needed.
-- Source: approved direction of 2026-11-18 (the bot goes to production)
+- Source: approved direction of 2026-11-23 (order history screen in the stock system)
 -->
-
 # Pedido WhatsApp → Excel Constitution
 
 ## Core Principles
@@ -177,7 +164,8 @@ application starts with a visible warning; in production it MUST refuse to start
 scopes), MUST be compared in constant time, and MUST NEVER be stored in the database or logged. A missing or
 invalid key MUST get 401, and a key without the needed scope MUST get 403, both as a pt-BR JSON error, and
 each MUST be logged by TYPE only. The scopes are `conversa` (send messages, download order files) and
-`modelo` (export and import the model and read its information). The ONLY public routes are the health
+`modelo` (export and import the model and read its information); `historico` (read-only listing of the
+stored orders of every conversation, with their order files). The ONLY public routes are the health
 check (`GET /saude`, which returns no data) and, in a later feature, the WhatsApp webhook (protected by its
 own signature verification). The test chat page and the OpenAPI documentation MUST be switchable off and
 MUST be off when `ENVIRONMENT=producao`. In production the application MUST bind to `0.0.0.0` and the port
@@ -237,4 +225,4 @@ guidance, PATCH for clarifications and wording. Every plan and review MUST verif
 these principles; any deviation MUST be written down and justified in the plan's complexity
 tracking. Principles I and II are non-negotiable and MUST NOT be waived by a plan.
 
-**Version**: 2.3.0 | **Ratified**: 2026-10-23 | **Last Amended**: 2026-11-18
+**Version**: 2.4.0 | **Ratified**: 2026-10-23 | **Last Amended**: 2026-11-23
