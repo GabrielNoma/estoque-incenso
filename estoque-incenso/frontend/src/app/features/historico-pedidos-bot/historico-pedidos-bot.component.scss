@@ -1,0 +1,29 @@
+:host { display: block; }
+.tela { padding: 16px; box-sizing: border-box; max-width: 900px; margin: 0 auto; }
+.cabecalho { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.cabecalho h2 { margin: 0; }
+.acoes { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.filtro { width: 180px; }
+.resumo { margin: 8px 0 12px; font-size: 13px; color: #616161; min-height: 1.2em; }
+.vazio { color: #757575; text-align: center; margin: 32px 0; }
+.erro { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;
+  background: #fdecea; color: #b71c1c; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+.lista { display: flex; flex-direction: column; gap: 12px; }
+.cartao { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px; overflow-wrap: anywhere; }
+.topo { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.numero { font-weight: 600; }
+.quando, .conversa { font-size: 13px; color: #616161; }
+.selo { font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px; background: #eeeeee; color: #424242; }
+.selo.estado-confirmado { background: #e8f5e9; color: #2e7d32; }
+.selo.estado-aguardando { background: #fff8e1; color: #8d6e00; }
+.selo.estado-recusado { background: #fdecea; color: #b71c1c; }
+.selo.estado-substituido { background: #eeeeee; color: #616161; }
+.mensagem { margin: 8px 0; color: #424242; white-space: pre-wrap; }
+.itens { margin: 0 0 8px; padding-left: 18px; }
+.rodape { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.resposta { font-size: 13px; color: #616161; }
+.mais { display: flex; justify-content: center; margin: 16px 0; }
+@media (max-width: 600px) {
+  .tela { padding: 8px; }
+  .filtro { width: 100%; }
+}

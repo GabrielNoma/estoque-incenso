@@ -16,5 +16,10 @@ export const routes: Routes = [
     path: 'pedidos',
     loadComponent: () => import('./features/pedido-bot/pedido-bot.component')
       .then(m => m.PedidoBotComponent)
+  },
+  {
+    path: 'historico-pedidos-bot',
+    loadComponent: () => import('./features/historico-pedidos-bot/historico-pedidos-bot.component')
+      .then(m => m.HistoricoPedidosBotComponent)
   }
 ];
