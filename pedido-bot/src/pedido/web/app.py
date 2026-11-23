@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 from urllib.parse import unquote
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.staticfiles import StaticFiles
@@ -122,6 +122,23 @@ def create_app(database_url=None, chat_model=None, template_path=None, embedder=
             log.warning("saude=indisponivel tipo=%s", type(error).__name__)
             return JSONResponse({"status": "indisponivel"}, status_code=503)
         return {"status": "ok"}
+
+    @app.get("/api/pedidos", dependencies=[Depends(exigir("historico"))])
+    def historico(limite: int = Query(50, ge=1, le=200), antes: int | None = Query(None, ge=1),
+                  estado: str | None = Query(None, pattern="^(aguardando|confirmado|recusado|substituido)$")):
+        """The order history (read only): newest first, paged by the id of the last order seen."""
+        linhas = store.listar_historico(limite + 1, antes=antes, estado=estado)  # one extra row: is there more?
+        mais = len(linhas) > limite
+        linhas = linhas[:limite]
+        pedidos = [{
+            "id": p["id"], "conversa": p["telefone"], "mensagem": p["mensagem"],
+            "itens": [{"nome": i["nome"], "quantidade": i["quantidade"]} for i in p["itens"]],
+            "lista": p["lista"], "estado": p["estado"], "resposta": p["resposta"],
+            "criado_em": p["criado_em"], "respondido_em": p["respondido_em"], "modelo_versao": p["modelo_versao"],
+            "arquivo": ({"nome": f"pedido-{p['id']}.xlsx", "url": f"/api/pedidos/{p['id']}/planilha"}
+                        if p["estado"] == "confirmado" else None),
+        } for p in linhas]
+        return {"pedidos": pedidos, "proximo": linhas[-1]["id"] if mais else None}
 
     @app.get("/api/pedidos/{pedido_id}/planilha", dependencies=[Depends(exigir("conversa"))])
     def planilha(pedido_id: int):

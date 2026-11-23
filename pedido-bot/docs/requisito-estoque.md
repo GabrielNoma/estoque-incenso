@@ -2,7 +2,7 @@
 
 1. Add two environment variables to the stock **backend**: `PEDIDO_BOT_URL` (the bot's address; a private
    address when the platform offers one) and `PEDIDO_BOT_API_KEY` (a key of the bot with the scopes
-   `conversa` and `modelo`).
+   `conversa`, `modelo` and `historico`; the last one is only for the order history screen).
 2. In `backend/src/routes/pedidoBot.js`, send the header `Authorization: Bearer ${PEDIDO_BOT_API_KEY}` on every call to
    the bot. The key never reaches the browser and is never logged.
 3. Map the new bot errors for the screen: 401/403 → a Portuguese "serviço de pedidos não autorizado" notice

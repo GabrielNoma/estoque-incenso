@@ -98,6 +98,16 @@ class Store:
         if closed is None:
             raise InvalidTransition(f"order {pedido_id} is not waiting for an answer")
 
+    def listar_historico(self, limite: int, antes: int | None = None, estado: str | None = None) -> list[dict]:
+        """The stored orders of every conversation, newest first; `antes` is the id cursor (only older orders)."""
+        with self._connect() as db:
+            rows = db.execute(
+                "select id, telefone, mensagem, itens, lista, estado, resposta, criado_em, respondido_em, "
+                "modelo_versao from pedido.pedidos where (%s::bigint is null or id < %s) "
+                "and (%s::text is null or estado = %s) order by id desc limit %s",
+                (antes, antes, estado, estado, limite)).fetchall()
+        return [_pedido(r) for r in rows]
+
     def list_pedidos(self, telefone: str | None = None) -> list[dict]:
         with self._connect() as db:
             if telefone is None:
