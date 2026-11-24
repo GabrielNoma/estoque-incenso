@@ -13,6 +13,10 @@ const CABECALHOS_DE_DOWNLOAD = ['content-type', 'content-disposition']
 // Lidos a cada chamada para permitir configuração por ambiente (e testes).
 const urlDoBot = () => (process.env.PEDIDO_BOT_URL || 'http://127.0.0.1:8000').replace(/\/+$/, '')
 const timeoutDoBot = () => Number(process.env.PEDIDO_BOT_TIMEOUT_MS) || 240000
+// Partida a frio do robô: ~20 tentativas a cada 5 s cobrem os ~80 s que ele leva para acordar.
+const STATUS_PASSAGEIROS = new Set([429, 502, 503])
+const tentativasDoBot = () => Number(process.env.PEDIDO_BOT_TENTATIVAS) || 20
+const esperaDoBot = () => (process.env.PEDIDO_BOT_ESPERA_MS === undefined ? 5000 : Number(process.env.PEDIDO_BOT_ESPERA_MS))
 // Chave do robô (escopos conversa e modelo): só do ambiente do servidor, nunca vai ao navegador nem ao log.
 const chaveDoBot = () => process.env.PEDIDO_BOT_API_KEY || ''
 
@@ -41,8 +45,15 @@ async function chamarBot(caminho, opcoes = {}) {
   let resposta
   let corpo
   try {
-    resposta = await fetch(`${urlDoBot()}${caminho}`, { ...opcoes, headers, signal: controle.signal })
-    corpo = Buffer.from(await resposta.arrayBuffer())
+    // Robô dormindo (plano gratuito): o gateway responde 429/502/503 na hora por ~80 s. Insistimos em vez
+    // de mostrar erro. Esses status chegam ANTES do robô, então repetir não duplica pedido. O timeout vale
+    // para o conjunto das tentativas.
+    for (let tentativa = 1; ; tentativa++) {
+      resposta = await fetch(`${urlDoBot()}${caminho}`, { ...opcoes, headers, signal: controle.signal })
+      corpo = Buffer.from(await resposta.arrayBuffer())
+      if (!STATUS_PASSAGEIROS.has(resposta.status) || tentativa >= tentativasDoBot()) break
+      await new Promise((r) => setTimeout(r, esperaDoBot()))
+    }
   } catch (err) {
     throw new BotIndisponivelError(classificarFalha(err, { url: `${urlDoBot()}${caminho}`, chave: chaveDoBot() }))
   } finally {
