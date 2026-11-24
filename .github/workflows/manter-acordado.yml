@@ -1,0 +1,26 @@
+name: Manter servicos acordados
+
+# O plano gratuito do Render dorme apos ~15 min sem acesso e a partida a frio
+# leva ~1 min. Este ping a cada 10 min evita isso em horario comercial.
+#
+# Por que so em horario comercial: o Render da 750 h gratuitas por mes para o
+# workspace todo. Dois servicos acordados 24 h somam ~1490 h e seriam suspensos.
+# Janela: 07h-19h (Brasilia) de segunda a sabado = ~624 h para os dois.
+# O cron do GitHub usa UTC: 10h-21h UTC = 07h-18h59 em Brasilia.
+
+on:
+  schedule:
+    - cron: '*/10 10-21 * * 1-6'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Acordar pedido-bot
+        run: curl -fsS --retry 3 --retry-delay 20 --retry-all-errors --max-time 90 https://pedido-bot-qyl9.onrender.com/saude
+      - name: Acordar estoque-incenso
+        run: curl -fsS --retry 3 --retry-delay 20 --retry-all-errors --max-time 90 -o /dev/null https://estoque-incenso.onrender.com/
