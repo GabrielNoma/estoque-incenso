@@ -12,6 +12,7 @@ let app
 let bot
 let recebido // última requisição vista pelo robô falso
 let comportamento = {}
+let chamadas = 0 // quantas vezes o robô falso foi chamado
 
 function lerCorpo(req) {
   return new Promise((resolve) => {
@@ -29,6 +30,9 @@ function enviarJson(res, status, obj) {
 async function tratarBot(req, res) {
   const corpo = await lerCorpo(req)
   recebido = { method: req.method, url: req.url, headers: req.headers, corpo }
+  chamadas += 1
+  // `sequencia`: respostas de erro consumidas uma a uma (robô acordando); depois volta ao normal.
+  if (comportamento.sequencia?.length) return enviarJson(res, comportamento.sequencia.shift(), { erro: 'x' })
   if (comportamento.demora) await new Promise((r) => setTimeout(r, comportamento.demora))
   if (comportamento.status) return enviarJson(res, comportamento.status, comportamento.json)
 
@@ -83,6 +87,7 @@ before(async () => {
   await new Promise((r) => bot.listen(0, '127.0.0.1', r))
   process.env.PEDIDO_BOT_URL = `http://127.0.0.1:${bot.address().port}`
   process.env.PEDIDO_BOT_TIMEOUT_MS = '90000'
+  process.env.PEDIDO_BOT_ESPERA_MS = '0'
   app = await buildTestApp()
 })
 
@@ -91,7 +96,7 @@ after(async () => {
   await new Promise((r) => bot.close(r))
 })
 
-test.beforeEach(() => { comportamento = {}; recebido = null })
+test.beforeEach(() => { comportamento = {}; recebido = null; chamadas = 0 })
 
 test('POST /mensagem encaminha telefone/texto e devolve resposta sem arquivo', async () => {
   const res = await app.inject({
@@ -385,4 +390,38 @@ test('GET /historico: robô fora do ar vira 503 em português', async () => {
     assert.equal(res.statusCode, 503)
     assert.deepEqual(res.json(), { error: MSG_INDISPONIVEL })
   } finally { process.env.PEDIDO_BOT_URL = anterior }
+})
+
+// Plano gratuito: o robô dorme e leva ~80 s para acordar; nesse tempo o gateway responde 429/502/503 na hora.
+// O estoque insiste sozinho em vez de mostrar erro.
+test('robô acordando (429, 429, depois ok): histórico e mensagem dão certo sem erro na tela', async () => {
+  comportamento = { sequencia: [429, 429] }
+  const hist = await app.inject({ method: 'GET', url: '/api/pedido-bot/historico?limite=50' })
+  assert.equal(hist.statusCode, 200)
+  assert.equal(chamadas, 3)
+
+  chamadas = 0
+  comportamento = { sequencia: [429, 502, 503] }
+  const msg = await app.inject({ method: 'POST', url: '/api/pedido-bot/mensagem', payload: { conversaId: 'abc', texto: '2 dz ogum' } })
+  assert.equal(msg.statusCode, 200)
+  assert.equal(chamadas, 4)
+})
+
+test('insiste só até PEDIDO_BOT_TENTATIVAS e então devolve o aviso de limite', async () => {
+  process.env.PEDIDO_BOT_TENTATIVAS = '3'
+  try {
+    comportamento = { status: 429, json: { erro: 'x' } }
+    const res = await app.inject({ method: 'GET', url: '/api/pedido-bot/modelo/info' })
+    assert.equal(res.statusCode, 429)
+    assert.equal(chamadas, 3)
+  } finally { delete process.env.PEDIDO_BOT_TENTATIVAS }
+})
+
+test('401, 403 e 422 não são repetidos (não são falha passageira)', async () => {
+  for (const status of [401, 403, 422]) {
+    chamadas = 0
+    comportamento = { status, json: { erro: 'x', mensagem: 'm' } }
+    await app.inject({ method: 'GET', url: '/api/pedido-bot/modelo/info' })
+    assert.equal(chamadas, 1, `status ${status}`)
+  }
 })
