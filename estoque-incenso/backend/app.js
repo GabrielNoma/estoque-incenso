@@ -13,6 +13,7 @@ function buildApp() {
   app.register(require('./src/plugins/db'))
   app.register(require('./src/plugins/cors'))
   app.register(require('./src/plugins/static'))
+  app.register(require('./src/plugins/acordarRobo'))
 
   app.register(require('./src/routes/funcionarias'), { prefix: '/api' })
   app.register(require('./src/routes/registros'), { prefix: '/api' })

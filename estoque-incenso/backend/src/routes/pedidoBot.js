@@ -177,3 +177,4 @@ async function pedidoBotRoutes(fastify) {
 
 module.exports = pedidoBotRoutes
 module.exports.classificarFalha = classificarFalha
+module.exports.urlDoBot = urlDoBot
